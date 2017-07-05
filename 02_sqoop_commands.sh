@@ -21,7 +21,7 @@ sqoop list-tables
     # -m 1 represents that there is one mapper
     # by default there are 4 mappers used when no mapper is specified
     # this command creates file in the HDFS in the home directory for the user ~/emp/part-m-00000
-    # the m represents that this is a mapper job
+    # the m represents that this is a mapper job, instead of =m --num-mappers can be used as well
 sqoop import 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -29,5 +29,19 @@ sqoop import
   --password <db_user_name_password>
   --table emp 
   -m 1
+
+# Import table from RDBMS to HDFS using default mappers
+  # The below command has not specified the number of mappers. 
+  # So by default 4 mapper jobs are run and it creates 4 files in the home directory
+  # ~/emp/part-m-00000, ~/emp/part-m-00001, ~/emp/part-m-00002, ~/emp/part-m-00003
+  # due to the primary key on EMPNO, the range of EMPNO is split into 4 partitions
+  # the EMPNO falling into that range of EMPNOs goes into that specific partitioned file.
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+
 
 
