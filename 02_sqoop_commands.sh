@@ -30,6 +30,7 @@ sqoop import
   --table emp 
   -m 1
 
+
 # Import table from RDBMS to HDFS using default mappers
   # The below command has not specified the number of mappers. 
   # So by default 4 mapper jobs are run and it creates 4 files in the home directory
@@ -44,4 +45,18 @@ sqoop import
   --table emp 
 
 
+# Import table from RDBMS to HDFS using split-by
+  # When there is no primary key on a table and only one partition is required then it's fine.
+  # When there is no primary key on a table and more than one partition is required, then there should be a split-by clause
+  # The split-by clause splits the input data set into different ranges based on their values
+  # Having more than one partition without primary key and without split-by leads to error
+  # 'num-mappers' is same as 'm'
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --split-by empno 
+  --num-mappers 2
 
