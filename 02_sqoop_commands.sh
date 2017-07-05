@@ -85,6 +85,7 @@ sqoop import
   # Use append when newer rows are continually being added with increasing rowid values
   # '--check-column' specifies the column to be checked and '--last-value' specifies the last value available in HDFS
   # lastmodified mode works if there is a timestamp that captures latest updates happened on a table
+  # run the last three insert statements from the file 01_sql_statements.sql to test the incremental load
 sqoop import 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -103,7 +104,7 @@ sqoop import
   # Data will be exported to a table that has no data in it
   # Data will be exported from a directory having multiple mapper files
   # Data can also be exported from a specific mapper file in a directory
-  # 
+  # There are many options available like insert / update. The options can be chosen according to use case
 sqoop export 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -111,3 +112,14 @@ sqoop export
   --password <db_user_name_password>
   --table emp_export 
   --export-dir emp
+
+sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir /user/rajesh.kancharla_outlook/emp/part-m-00001
+
+
+
