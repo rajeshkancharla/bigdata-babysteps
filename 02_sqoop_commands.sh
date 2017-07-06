@@ -122,4 +122,47 @@ sqoop export
   --export-dir /user/rajesh.kancharla_outlook/emp/part-m-00001
 
 
+# Import table data from RDBMS to HDFS with joins - free form query imports
+  # Instead of importing whole table, it is possible to define a query with selected columns as well
+  # Also, we can join tables and pick up the required columns from multiple tables
+  # the target-dir is mandatory while importing a free form query
+  # while importing query results in parallel, then each map task will need to execute a copy of the query with results partitioned by bounding conditions in sqoop
+  # Hence $CONDITIONS token need to be used which each Sqoop process will replace with a unique condition expression
+  # Also a column needs to be included for --split-by
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --target-dir /user/rajesh.kancharla_outlook/sqoopdemo
+  --query 'select ename,job,sal,emp.deptno from emp join dept on emp.deptno = dept.deptno WHERE $CONDITIONS'
+  --split-by emp.deptno
+  --num-mappers 1
+
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --target-dir /user/rajesh.kancharla_outlook/sqoopdemo
+  --query "select ename,job,sal,emp.deptno from emp where emp.deptno = 30 AND \$CONDITIONS"
+  --num-mappers 1
+
+
+# Import table from RDBMS to Hive
+  # Though Sqoop's main role is to get data from RDBMS to HDFS, it can also be used to import data into Hive
+  # Sqoop generates and executes a CREATE TABLE statement to define the data's layout in Hive
+  # If Hive table is already present, --hive-overwrite option indicates that table needs to be replaced
+  # As part of this import, first data gets copied from RDBMS to HDFS and then data moves from HDFS to Hive Warehouse directory
+  # before running the below statement, in hive a database by name hive_rajeshk has been created
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --hive-import
+  --hive-table hive_rajeshk.emp_hive
+
 
