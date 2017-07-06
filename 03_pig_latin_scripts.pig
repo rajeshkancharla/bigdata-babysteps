@@ -29,3 +29,11 @@ SALES, Sales Department
 IT,Information Technology
 
 */
+
+
+-- Step-1: Load emp.txt without schema
+-- Pig has a feature of lazy processing
+-- It doesn't run until a command to dump is issued
+-- It piles up all the 
+grunt> employee = load '/user/rajesh.kancharla_outlook/pig_files/emp.txt' using PigStorage(',');
+grunt> dump employee;
