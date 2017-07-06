@@ -99,29 +99,6 @@ sqoop import
   --last-value 7934
   
   
-# Export table from HDFS to RDBMS
-  # This helps in exporting the data from HDFS to RDBMS
-  # Data will be exported to a table that has no data in it
-  # Data will be exported from a directory having multiple mapper files
-  # Data can also be exported from a specific mapper file in a directory
-  # There are many options available like insert / update. The options can be chosen according to use case
-sqoop export 
-  --connect jdbc:mysql://<server_ip>/rajeshk 
-  --driver com.mysql.jdbc.Driver 
-  --username <db_user_name> 
-  --password <db_user_name_password>
-  --table emp_export 
-  --export-dir emp
-
-sqoop export 
-  --connect jdbc:mysql://<server_ip>/rajeshk 
-  --driver com.mysql.jdbc.Driver 
-  --username <db_user_name> 
-  --password <db_user_name_password>
-  --table emp_export 
-  --export-dir /user/rajesh.kancharla_outlook/emp/part-m-00001
-
-
 # Import table data from RDBMS to HDFS with joins - free form query imports
   # Instead of importing whole table, it is possible to define a query with selected columns as well
   # Also, we can join tables and pick up the required columns from multiple tables
@@ -166,3 +143,24 @@ sqoop import
   --hive-table hive_rajeshk.emp_hive
 
 
+# Export table from HDFS to RDBMS
+  # This helps in exporting the data from HDFS to RDBMS
+  # Data will be exported to a table that has no data in it
+  # Data will be exported from a directory having multiple mapper files
+  # Data can also be exported from a specific mapper file in a directory
+  # There are many options available like insert / update. The options can be chosen according to use case
+sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+
+sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir /user/rajesh.kancharla_outlook/emp/part-m-00001
