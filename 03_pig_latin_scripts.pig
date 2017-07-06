@@ -31,9 +31,35 @@ IT,Information Technology
 */
 
 
--- Step-1: Load emp.txt without schema
+/* Load emp.txt without schema */
 -- Pig has a feature of lazy processing
 -- It doesn't run until a command to dump is issued
--- It piles up all the 
+-- It piles up all the commands until a dump is issued and runs all dependent commands in sequence
+-- the dump command starts a map-reduce job and processes the relations as per users' commands
 grunt> employee = load '/user/rajesh.kancharla_outlook/pig_files/emp.txt' using PigStorage(',');
 grunt> dump employee;
+
+
+/* Display the names from employee */
+-- the employee dataset is created in the above step
+-- from each entry of the relation, it picks up the second value ($1) and displays the results
+-- the first column in the relation is represented with $0
+grunt> name = foreach employee generate $1 ;
+grunt> dump name;
+
+
+/* Load emp.txt with schema */
+-- While loading the data from a file, the structure of the data can be specified as a schema
+grunt> employee = load '/user/rajesh.kancharla_outlook/pig_files/emp.txt' using PigStorage(',') as (emp_id:int, emp_name:chararray, emp_dept:chararray, emp_salary:int);
+grunt> dump employee;
+
+grunt> dept = load '/user/rajesh.kancharla_outlook/pig_files/dept.txt' using PigStorage(',') as (dept_id:chararray, dept_name:chararray);
+grunt> dump dept;
+
+/* Describe the relations */
+describe employee;
+describe dept;
+
+
+
+
