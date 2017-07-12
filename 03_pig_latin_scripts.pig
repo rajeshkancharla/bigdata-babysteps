@@ -218,3 +218,13 @@ C = GROUP B by word;
 D = FOREACH C GENERATE group, COUNT(B);
 dump D;
 
+
+/* Route the output to HDFS instead of console */
+-- It is possible to re-direct the output of a DUMP command into HDFS using the STORE INTO command
+-- When this is used, instead of showing the results on the console, the output is saved in a file in HDFS
+A = load '/user/rajesh.kancharla_outlook/pig_files/emp.txt';
+B = FOREACH A GENERATE FLATTEN(TOKENIZE($0)) as word;
+C = GROUP B by word;
+D = FOREACH C GENERATE group, COUNT(B);
+STORE D INTO '/user/rajesh.kancharla_outlook/pig_files/emp_wc.txt' USING PigStorage(',');
+
