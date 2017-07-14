@@ -1,3 +1,4 @@
+/*
 SCALA
 =======
 -- spark-shell opens a prompt for spark and scala
@@ -18,7 +19,7 @@ SCALA
 -- Tuple - it is an indexed collection. It is a heterogenous collection of different data types
 		Index starts with 1 instead of 0 like other collections.
 -- Set - Set always have unique elements. Even if duplicates are inserted, it stores unique values.
-
+*/
 
 
 		
