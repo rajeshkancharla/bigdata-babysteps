@@ -4,6 +4,7 @@ Hive is a data warehousing infrastructure based on Apache Hadoop. Hive is design
 
 /* Source files */
 -- emp.txt
+/*
 1,Mark,HR,1000
 2,Peter,SALES,1200
 3,Henry,HR,1500
@@ -31,6 +32,7 @@ IT,Information Technology
 8,Mathew,aa,m,us,ca,1,2015,7,18
 9,Ricky,dd,m,us,fl,7,2015,6,4
 10,Brett,aa,m,us,il,1,2015,6,11
+*/
 
 /* Launch Hive */
 -- When there is a setup available for HDFS, use the command hive or any other command provided by the service provider
