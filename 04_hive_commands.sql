@@ -99,5 +99,101 @@ SELECT * FROM ex_test
 -- If the files in the path are not of the same structure, wherever the data type matches, the data gets loaded and others become NULL
 -- So it must be ensured of consistent format while using files for external table in hive
 
+-- *************************************************************************************************************************************
+/* PARTITIONING */
+
+-- Partitioning is used for speeding up the search activities and logical segregation of the data
+-- There are Static and Dynamic partitioning in Hive
+-- When the data is already segregated based on certain parameter, then static partitioning can be used
+
+/* STATIC PARTITIONING */
+-- Create partitioned table
+hive> create table emp_spart(e_id int, e_name string, e_salary int) partitioned by (e_dept string)
+row format delimited fields terminated by ',';
+
+-- Load data into partitioned table
+-- Note that the input data is already partitioned by the partition key in different files
+-- So all the files are loaded separately into different partitions
+hive> load data local inpath '/home/rajesh.kancharla_outlook/pig/emp_hr_1.txt' into table emp_spart partition(e_dept = 'HR');
+hive> load data local inpath '/home/rajesh.kancharla_outlook/pig/emp_it_1.txt' into table emp_spart partition(e_dept = 'IT');
+hive> load data local inpath '/home/rajesh.kancharla_outlook/pig/emp_sales_1.txt' into table emp_spart partition(e_dept = 'SALES');
+
+-- the partitions are created as separate directories with the name as partition
+-- Ex: /apps/hive/warehouse/rajeshk.db/emp_spart/e_dept=HR
+--     /apps/hive/warehouse/rajeshk.db/emp_spart/e_dept=IT
+--     /apps/hive/warehouse/rajeshk.db/emp_spart/e_dept=SALES
+
+-- to see all the partitions on a table
+hive> show partitions emp_spart;
+
+
+/* DYNAMIC PARTITIONING */
+
+-- We always need an external staging table while using the dynamic partitioning
+-- The location pointed here is from HDFS in which there is one single file emp.txt
+-- There are no separate files split by the partitioned key dept.
+hive> create external table emp_stage (e_id int, e_name string, e_dept string, e_salary int) 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/user/rajesh.kancharla_outlook/ex_data';
+
+-- create the dynamic partitioned table
+hive> create table emp_dpart (e_id int, e_name string, e_salary int) partitioned by (e_dept string) 
+
+-- Parameters required for dynamic partitioning
+-- these are session level parameters but these can be set forever by admin
+-- there is no impact on static partitioning when they are enabled for dynamic partitioning
+hive> SET hive.exec.dynamic.partition=true;
+hive> SET hive.exec.dynamic.partition.mode=nonstrict;
+
+-- Insert data into dynamic partitioned table from the staging table
+hive> insert into table emp_dpart partition(e_dept) select e_id, e_name, e_salary, e_dept from emp_stage;
+
+-- the partitions are created as separate directories with the name as partition
+-- Ex: /apps/hive/warehouse/rajeshk.db/emp_dpart/e_dept=HR
+--     /apps/hive/warehouse/rajeshk.db/emp_dpart/e_dept=IT
+--     /apps/hive/warehouse/rajeshk.db/emp_dpart/e_dept=SALES
+
+-- to see all the partitions on a table
+hive> show partitions emp_dpart;
+
+
+-- *************************************************************************************************************************************
+/* BUCKETING */
+-- The data is distributed into buckets
+-- The number of buckets is predefined by the user
+-- The basis for routing data into buckets is determined by (ID Value of the column) % (Number of Buckets)
+-- Hashing function takes care of distribution of data
+
+-- Set the environment variable to enable bucketing
+hive> set hive.enforce.bucketing=true
+
+-- An external staging table is required for loading data into bucketed table
+hive> create external table emp_stage (e_id int, e_name string, e_dept string, e_salary int) 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/user/rajesh.kancharla_outlook/ex_data';
+
+-- Create Bucketed table
+hive> create table b_emp(e_id int, e_name string, e_dept string, e_salary int) 
+clustered by (e_id) into 4 buckets
+row format delimited fields terminated by ',';
+
+-- Insert data into bucketed table
+insert into table b_emp select * from emp_stage;
+
+-- At this stage, a directory b_emp is created in hive warehouse with 4 files as there are 4 buckets
+-- Ex: /apps/hive/warehouse/rajeshk.db/b_emp/000000_0.deflate
+--     /apps/hive/warehouse/rajeshk.db/b_emp/000001_0.deflate
+--     /apps/hive/warehouse/rajeshk.db/b_emp/000002_0.deflate
+--     /apps/hive/warehouse/rajeshk.db/b_emp/000003_0.deflate
+-- All the files are in binary format, however in order to read the contents of each of the bucketed files, use
+
+hive> select * from b_emp tablesample(bucket 1 out of 4 on e_id);
+hive> select * from b_emp tablesample(bucket 2 out of 4 on e_id);
+hive> select * from b_emp tablesample(bucket 3 out of 4 on e_id);
+hive> select * from b_emp tablesample(bucket 4 out of 4 on e_id);
+
+
+
+
 
 
