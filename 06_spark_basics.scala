@@ -74,7 +74,7 @@ res3: Array[Int] = Array(1, 2, 3, 4, 5)
 
 
 Transformations: filter
-=======================
+========================
 
 scala> val input = sc.parallelize(List(1,2,3,4,5))
 input: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[3] at parallelize at <console>:27
