@@ -1,6 +1,6 @@
 /*
 SPARK:
-======
+=======
 - Analytical or processing engine
 - Component which only proceses your data
 - Won't provide storage to it
