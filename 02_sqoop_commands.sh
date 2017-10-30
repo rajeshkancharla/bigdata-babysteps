@@ -159,7 +159,18 @@ sqoop import
   --check-column empno
   --last-value 7934
   
-  
+
+# PASSWORD LESS SQOOP COMMAND
+# If the password for the database schema is specified in the command itself, then it is easily retrievable from OS level.
+# To enhance security, -P option can be used so that the password will be keyed in by user upon prompt
+# One more option is to get the password from a file which has access restrictions.
+sqoop import -P
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --table emp 
+  --num-mappers 1
+
 # Import table data from RDBMS to HDFS with joins - free form query imports
   # Instead of importing whole table, it is possible to define a query with selected columns as well
   # Also, we can join tables and pick up the required columns from multiple tables
