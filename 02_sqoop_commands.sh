@@ -16,6 +16,7 @@
 # It is advised not to use resource intensive functions while fetching data from the database, as it effects performance.
 
 
+# GET ALL DATABASES
 # Get the list all the databases available 
 sqoop list-databases 
   --connect jdbc:mysql://<server_ip> 
@@ -23,6 +24,7 @@ sqoop list-databases
   --password <db_user_name_password>
 
 
+# GET ALL TABLES IN A DATABASE
 # List all tables available in a particular database. Here database name is rajeshk
 sqoop list-tables 
   --connect jdbc:mysql://<server_ip>/rajeshk 
@@ -31,6 +33,7 @@ sqoop list-tables
   --password <db_user_name_password>
 
 
+# FULL IMPORT OF TABLE WITH 1 MAPPER
 # Import table from RDBMS to HDFS
     # -m 1 represents that there is one mapper
     # by default there are 4 mappers used when no mapper is specified
@@ -46,6 +49,7 @@ sqoop import
   -m 1
 
 
+# FULL IMPORT OF TABLE WITH DEFAULT MAPPERS
 # Import table from RDBMS to HDFS using default mappers
   # The below command has not specified the number of mappers. 
   # So by default 4 mapper jobs are run and it creates 4 files in the home directory
@@ -60,6 +64,7 @@ sqoop import
   --table emp 
 
 
+# FULL IMPORT OF TABLE WITH SPLIT BY
 # Import table from RDBMS to HDFS using split-by
   # When there is no primary key on a table and only one partition is required then it's fine.
   # When there is no primary key on a table and more than one partition is required, then there should be a split-by clause, else the Sqoop job would fail.
@@ -76,6 +81,7 @@ sqoop import
   --num-mappers 2
 
 
+# FULL IMPORT OF TABLE INTO A DIRECTORY
 # Import table from RDBMS to HDFS in particular directory
   # By default the HDFS files are created in the home directory of the user
   # If the directory already exists, the job fails with the message that the folder already exists.
@@ -93,6 +99,7 @@ sqoop import
   --num-mappers 2
 
 
+# FULL IMPORT OF TABLE INTO A WAREHOUSE DIRECTORY
 # Import table from RDBMS to HDFS in particular directory
   # By default the HDFS files are created in the home directory of the user
   # If the directory already exists, the job fails with the message that the folder already exists.
@@ -114,6 +121,7 @@ sqoop import
   --num-mappers 2
 
 
+# SELECTIVE IMPORT FROM A TABLE WITH WHERE
 # Incremental Import table from RDBMS to HDFS
   # This helps in retrieving only rows newer than some previously imported set of rows
   # Two modes of incremental import - append and lastmodified
@@ -131,6 +139,7 @@ sqoop import
   --where "<where_condition>"
 
 
+# INCREMENTAL IMPORT BASED ON A KEY AND LAST VALUE
 # Incremental Import table from RDBMS to HDFS
   # This helps in retrieving only rows newer than some previously imported set of rows
   # Two modes of incremental import - append and lastmodified
