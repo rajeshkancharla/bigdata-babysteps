@@ -2,14 +2,25 @@
 # Sqoop is a tool designed to transfer data between Hadoop and relational databases or mainframes. You can use Sqoop to import data from a relational database management system (RDBMS) such as MySQL or Oracle or a mainframe into the Hadoop Distributed File System (HDFS), transform the data in Hadoop MapReduce, and then export the data back into an RDBMS.
 # Sqoop automates most of this process, relying on the database to describe the schema for the data to be imported. Sqoop uses MapReduce to import and export the data, which provides parallel operation as well as fault tolerance.
 
-# List all the databases available 
+# Actions that take place with Sqoop command:
+# Sqoop connects to the database to fetch the table metadata, the number of columns, names and their datatypes.
+# Depending on the particular database system, other useful metadata like partitioned table etc are also retrieved.
+# At this point, Sqoop is not transfering any data between database and HDFS, it is only querying catalog of tables and views.
+# Based on retrieved metadata, Sqoop generates a JAVA class and compile it using the JDK and Hadoop libraries.
+# Sqoop connects to the Hadoop cluster and submits a MapReduce job. Each mapper of the job transfers a slice of table's data.
+# As MapReduce executes multiple mappers at same time, Sqoop will transfer data in parallel to achieve the best possible performance by utilizing the potentia of the database server.
+# Each mapper transfers the table's data directly between the database and Hadoop cluster.
+# It is advised not to use resource intensive functions while fetching data from the database, as it effects performance.
+
+
+# Get the list all the databases available 
 sqoop list-databases 
   --connect jdbc:mysql://<server_ip> 
   --username <db_user_name> 
   --password <db_user_name_password>
 
 
-# List all tables available in a database. Here database name is rajeshk
+# List all tables available in a particular database. Here database name is rajeshk
 sqoop list-tables 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -48,7 +59,7 @@ sqoop import
 
 # Import table from RDBMS to HDFS using split-by
   # When there is no primary key on a table and only one partition is required then it's fine.
-  # When there is no primary key on a table and more than one partition is required, then there should be a split-by clause
+  # When there is no primary key on a table and more than one partition is required, then there should be a split-by clause, else the Sqoop job would fail.
   # The split-by clause splits the input data set into different ranges based on their values
   # Having more than one partition without primary key and without split-by leads to error
   # 'num-mappers' is same as 'm'
