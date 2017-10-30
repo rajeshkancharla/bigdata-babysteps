@@ -1,8 +1,11 @@
 # About Sqoop:
+# ============
 # Sqoop is a tool designed to transfer data between Hadoop and relational databases or mainframes. You can use Sqoop to import data from a relational database management system (RDBMS) such as MySQL or Oracle or a mainframe into the Hadoop Distributed File System (HDFS), transform the data in Hadoop MapReduce, and then export the data back into an RDBMS.
 # Sqoop automates most of this process, relying on the database to describe the schema for the data to be imported. Sqoop uses MapReduce to import and export the data, which provides parallel operation as well as fault tolerance.
 
+
 # Actions that take place with Sqoop command:
+# =============================================
 # Sqoop connects to the database to fetch the table metadata, the number of columns, names and their datatypes.
 # Depending on the particular database system, other useful metadata like partitioned table etc are also retrieved.
 # At this point, Sqoop is not transfering any data between database and HDFS, it is only querying catalog of tables and views.
@@ -109,7 +112,24 @@ sqoop import
   --split-by empno 
   --warehouse-dir warehouse
   --num-mappers 2
-  
+
+
+# Incremental Import table from RDBMS to HDFS
+  # This helps in retrieving only rows newer than some previously imported set of rows
+  # Two modes of incremental import - append and lastmodified
+  # Use append when newer rows are continually being added with increasing rowid values
+  # '--check-column' specifies the column to be checked and '--last-value' specifies the last value available in HDFS
+  # lastmodified mode works if there is a timestamp that captures latest updates happened on a table
+  # run the last three insert statements from the file 01_sql_statements.sql to test the incremental load
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --where "<where_condition>"
+
 
 # Incremental Import table from RDBMS to HDFS
   # This helps in retrieving only rows newer than some previously imported set of rows
