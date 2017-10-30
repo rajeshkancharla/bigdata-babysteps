@@ -64,7 +64,7 @@ sqoop import
 
 # Import table from RDBMS to HDFS in particular directory
   # By default the HDFS files are created in the home directory of the user
-  # If the directory already exists, the job fails with the message thet the folder already exists.
+  # If the directory already exists, the job fails with the message that the folder already exists.
   # Select a destination folder name that doesn't exist
   # '--target-dir' specifies the destination directory name
   # 'num-mappers' is same as 'm'
@@ -78,6 +78,27 @@ sqoop import
   --target-dir hdata/sqoop_demo
   --num-mappers 2
 
+
+# Import table from RDBMS to HDFS in particular directory
+  # By default the HDFS files are created in the home directory of the user
+  # If the directory already exists, the job fails with the message that the folder already exists.
+  # Select a destination folder name that doesn't exist
+  # '--target-dir' specifies the destination directory name
+  # If you want to run multiple sqoop jobs for multiple tables, we need to change --target-dir multiple times
+  # This can be avoided using --warehouse-dir. It is a directory under which a separate directory gets created with same name as
+  # the table name. So, any number of tables can be accommodated.
+  # 'num-mappers' is same as 'm'
+  # below command creates a directory warehouse. Inside warehouse there will be another directory same as table name emp.
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --split-by empno 
+  --warehouse-dir warehouse
+  --num-mappers 2
+  
 
 # Incremental Import table from RDBMS to HDFS
   # This helps in retrieving only rows newer than some previously imported set of rows
