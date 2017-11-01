@@ -171,6 +171,33 @@ sqoop import -P
   --table emp 
   --num-mappers 1
 
+
+# BINARY FILE FORMATS
+# Sqoop supports three file formats - text/csv, Avro, Hadoop's Sequence File. Latter two are Binary
+# Sequence File: It is a special Hadoop format for storing objects and implements Writable interface.
+#                Customized for Map Reduce and expects each record as key-value pairs
+
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp
+  --as-sequencefile
+
+# Avro Data File: A generic system that can store any arbitrary data structure.
+#                 It uses a Schema to describe what data structures are stored in the file. The schema is encoded as a JSON string 
+
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp
+  --as-avrodatafile
+
+
+
 # Import table data from RDBMS to HDFS with joins - free form query imports
   # Instead of importing whole table, it is possible to define a query with selected columns as well
   # Also, we can join tables and pick up the required columns from multiple tables
