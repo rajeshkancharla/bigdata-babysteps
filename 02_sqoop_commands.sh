@@ -187,6 +187,7 @@ sqoop import
 
 # Avro Data File: A generic system that can store any arbitrary data structure.
 #                 It uses a Schema to describe what data structures are stored in the file. The schema is encoded as a JSON string 
+#                 All files are created with an extension of .avro
 
 sqoop import 
   --connect jdbc:mysql://<server_ip>/rajeshk 
@@ -195,6 +196,46 @@ sqoop import
   --password <db_user_name_password>
   --table emp
   --as-avrodatafile
+
+
+# COMPRESS FILES
+# Sqoop takes advantage of inherent parallelism of Hadoop by leveraging Hadoop's execution engine, MapReduce to perform data transfers.
+# As MapReduce already has excellent support for compression, Sqoop simply reuses its powerful abilities to provide compression options.
+# All files are created with .gz extension
+
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp
+  --compress
+
+
+# SPEED UP TRANSFER
+# Rather than using JDBC interface for transferring data, direct mode delegates the job of transferring data to the native utilities provided by database vendor.
+# MySQL uses mysqldump and mysqlimport etc. for other database vendors
+# Produces only text output. Sequence File and Avro are not supported
+
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp
+  --direct
+
+
+# OVERRIDE TYPE MAPPING
+# The default mapping works, however in order to override the mapping, the --map-column-java parameter is used.
+# This parameter takes comma separated values as key-value pairs.
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp
+  --map-column-java empid=float
 
 
 
