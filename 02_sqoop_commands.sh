@@ -361,12 +361,12 @@ sqoop import
   --hive-table hive_rajeshk.emp_hive
 
 
+# EXPORT DATA FROM HDFS TO DATABASE
 # Export table from HDFS to RDBMS
   # This helps in exporting the data from HDFS to RDBMS
-  # Data will be exported to a table that has no data in it
+  # Data will be exported to a table that has no data in it (or) already having data in it
   # Data will be exported from a directory having multiple mapper files
-  # Data can also be exported from a specific mapper file in a directory
-  # There are many options available like insert / update. The options can be chosen according to use case
+  # Insert statements are created internally by the MapReduce program and lands data in the database
 sqoop export 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -375,6 +375,7 @@ sqoop export
   --table emp_export 
   --export-dir emp
 
+# Export specific file's contents only instead of full directory
 sqoop export 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -382,3 +383,96 @@ sqoop export
   --password <db_user_name_password>
   --table emp_export 
   --export-dir /user/rajesh.kancharla_outlook/emp/part-m-00001
+
+# If inserts take long, the data can be inserted using BATCH
+sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+  --batch
+
+# We can also specify the number of records that will be used in each insert statement. Default is 100
+sqoop export 
+  -Dsqoop.export.records.per.statement=10
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+
+# We can also specify the number of records that will be used in each transaction. Default is 100
+sqoop export 
+  -Dsqoop.export.statements.per.transaction=10
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+
+# Inserting into a Staging Table and then to Main table
+# Staging Table and Main table should have the same structure
+# Data inserts into Staging first. Only after all data is loaded into Staging successfully, it lands into Main Table.
+# There should be enough space to store data duplicates in both staging and main tables
+sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --export-dir emp
+  --table emp_export 
+  --staging_table stg_emp_export
+
+# Updates of data rather than Inserts.
+# If there are any incremental changes done after previous inserts, they can be updated.
+sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+  --update-key empno
+  
+  # Perform both Updates and Inserts
+  sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+  --update-key empno
+  --update-mode allowinsert
+ 
+ 
+   # Consider only selected columns
+   # By default Sqoop expects same number of columns in database table and HDFS mapper file
+   # In case the HDFS has lesser number of columns than the database table, use columns parameter to specify required columns in database table that are in HDFS
+  sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+  --columns <col1>, <col2>
+
+  # Invoking a Stored Procedure instead of Updates/Inserts
+  # Sqoop makes multiple mapper calls to Database Stored Procedure and all run in parallel
+  # Good to keep login in SP as minimal as possible to maximise the performance
+  sqoop export 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp_export 
+  --export-dir emp
+  --call <db_procedure_name>
+  
+  
+ 
