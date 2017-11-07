@@ -33,6 +33,28 @@ sqoop list-tables
   --password <db_user_name_password>
 
 
+# IMPORT ALL TABLES IN A DATABASE
+# Import all the tables residing in a database
+sqoop import-all-tables
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  
+
+# IMPORT ALL TABLES IN A DATABASE EXCEPT A FEW
+# Import all the tables residing in a database except a few
+# Pass the table names to be excluded to the parameter exclude-tables
+# --target-dir can't be used in this case
+# --warehouse-dir can be used
+sqoop import-all-tables
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --exclude-tables <comma_separated_table_names>
+  
+  
 # FULL IMPORT OF TABLE WITH 1 MAPPER
 # Import table from RDBMS to HDFS
     # -m 1 represents that there is one mapper
@@ -122,13 +144,9 @@ sqoop import
 
 
 # SELECTIVE IMPORT FROM A TABLE WITH WHERE
-# Incremental Import table from RDBMS to HDFS
-  # This helps in retrieving only rows newer than some previously imported set of rows
-  # Two modes of incremental import - append and lastmodified
-  # Use append when newer rows are continually being added with increasing rowid values
-  # '--check-column' specifies the column to be checked and '--last-value' specifies the last value available in HDFS
-  # lastmodified mode works if there is a timestamp that captures latest updates happened on a table
-  # run the last three insert statements from the file 01_sql_statements.sql to test the incremental load
+# Retrieve rows matching a condition
+  # This helps in retrieving only rows that match a condition in the base table.
+  # Where condition can be a combination of several conditions on different columns of the table
 sqoop import 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -138,27 +156,6 @@ sqoop import
   --num-mappers 2
   --where "<where_condition>"
 
-
-# INCREMENTAL IMPORT BASED ON A KEY AND LAST VALUE
-# Incremental Import table from RDBMS to HDFS
-  # This helps in retrieving only rows newer than some previously imported set of rows
-  # Two modes of incremental import - append and lastmodified
-  # Use append when newer rows are continually being added with increasing rowid values
-  # '--check-column' specifies the column to be checked and '--last-value' specifies the last value available in HDFS
-  # lastmodified mode works if there is a timestamp that captures latest updates happened on a table
-  # run the last three insert statements from the file 01_sql_statements.sql to test the incremental load
-sqoop import 
-  --connect jdbc:mysql://<server_ip>/rajeshk 
-  --driver com.mysql.jdbc.Driver 
-  --username <db_user_name> 
-  --password <db_user_name_password>
-  --table emp 
-  --split-by empno 
-  --target-dir hdata/sqoop_demo
-  --incremental append
-  --check-column empno
-  --last-value 7934
-  
 
 # PASSWORD LESS SQOOP COMMAND
 # If the password for the database schema is specified in the command itself, then it is easily retrievable from OS level.
@@ -238,7 +235,52 @@ sqoop import
   --map-column-java empid=float
 
 
+# INCREMENTAL IMPORT BASED ON A KEY AND LAST VALUE
+# Incremental Import table from RDBMS to HDFS
+  # This helps in retrieving only rows newer than some previously imported set of rows
+  # Two modes of incremental import - append and lastmodified
+  # Use append when newer rows are continually being added with increasing rowid values
+  # '--check-column' specifies the column to be checked and '--last-value' specifies the last value available in HDFS
+  # lastmodified mode works if there is a timestamp that captures latest updates happened on a table
+  # run the last three insert statements from the file 01_sql_statements.sql to test the incremental load
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --split-by empno 
+  --target-dir hdata/sqoop_demo
+  --incremental append
+  --check-column <column_name>
+  --last-value <column_value>
 
+
+# PRESERVE LAST IMPORTED VALUE
+# Using incremental import needs to refer last imported value
+  # Sqoop Metastore allows us to save all parametes for later use
+  # It allows to retain job definitions and to easily run them anytime
+sqoop job 
+  --create <job_name> 
+  -- 
+  import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --incremental append 
+  --check-column <column_name> 
+  --last-value <column_value>  
+
+This returns all the retained jobs
+   sqoop job --list
+This deletes job definitions no longer required
+   sqoop job --delete <job_name>
+This shows the saved job definitions
+   sqoop job --show <job_name>
+  
+  
 # Import table data from RDBMS to HDFS with joins - free form query imports
   # Instead of importing whole table, it is possible to define a query with selected columns as well
   # Also, we can join tables and pick up the required columns from multiple tables
