@@ -280,14 +280,19 @@ This deletes job definitions no longer required
 This shows the saved job definitions
    sqoop job --show <job_name>
   
-  
-# Import table data from RDBMS to HDFS with joins - free form query imports
+
+# FREE FORM QUERY IMPORT
+# Import table data from RDBMS to HDFS with joins
   # Instead of importing whole table, it is possible to define a query with selected columns as well
   # Also, we can join tables and pick up the required columns from multiple tables
+  # In the Free Form Query, Sqoop can't use the database catalogue to fetch the metadata
+  # Table import might be faster than the free form query import
+  # the query specifies the query to be used
+  # the split-by is required to be specified. Generally the Primary key on the table is specified.
   # the target-dir is mandatory while importing a free form query
-  # while importing query results in parallel, then each map task will need to execute a copy of the query with results partitioned by bounding conditions in sqoop
+  # While importing query results in parallel, then each map task will need to execute a copy of the query with results partitioned by bounding conditions in sqoop
   # Hence $CONDITIONS token need to be used which each Sqoop process will replace with a unique condition expression
-  # Also a column needs to be included for --split-by
+  # if the join query is complex, it is better to store the data into a temporary table and access it in the query
 sqoop import 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
@@ -307,6 +312,37 @@ sqoop import
   --query "select ename,job,sal,emp.deptno from emp where emp.deptno = 30 AND \$CONDITIONS"
   --num-mappers 1
 
+
+# CUSTOM BOUNDARIES
+# Free Form Import - Specify Boundaries for Split By Column
+  # boundary-query parameter specifies the min and max values to be used by the split-by parameter so that it can run multiple threads
+  # the boundary query should only return 2 values which are min and max
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --target-dir /user/rajesh.kancharla_outlook/sqoopdemo
+  --query 'select ename,job,sal,emp.deptno from emp join dept on emp.deptno = dept.deptno WHERE $CONDITIONS'
+  --split-by emp.deptno
+  --boundary-query "select min(deptno), max(deptno) from emp"
+
+
+# RENAME FREE FORM JOB NAMES
+  # When the job is triggered, all jobs performing free form import use same name QueryResult.jar
+  # In order to identify which job is running, it is possible to define a custom name for the MapReduce job
+  # --mapreduce-job-name parameter is useful in this scenario
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --target-dir /user/rajesh.kancharla_outlook/sqoopdemo
+  --query 'select ename,job,sal,emp.deptno from emp join dept on emp.deptno = dept.deptno WHERE $CONDITIONS'
+  --split-by emp.deptno
+  --boundary-query "select min(deptno), max(deptno) from emp"
+  --mapreduce-job-name <custom_job_name>
+  
 
 # Import table from RDBMS to Hive
   # Though Sqoop's main role is to get data from RDBMS to HDFS, it can also be used to import data into Hive
