@@ -343,8 +343,9 @@ sqoop import
   --boundary-query "select min(deptno), max(deptno) from emp"
   --mapreduce-job-name <custom_job_name>
   
-
-# Import table from RDBMS to Hive
+  
+# IMPORT DIRECTLY TO HIVE
+# Import table from RDBMS to Hive Default database
   # Though Sqoop's main role is to get data from RDBMS to HDFS, it can also be used to import data into Hive
   # Sqoop generates and executes a CREATE TABLE statement to define the data's layout in Hive
   # If Hive table is already present, --hive-overwrite option indicates that table needs to be replaced
@@ -358,7 +359,88 @@ sqoop import
   --table emp 
   --num-mappers 2
   --hive-import
-  --hive-table hive_rajeshk.emp_hive
+
+# Import into specific Hive database
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --hive-import
+  --hive-database <database_name>
+
+# Import into specific custom table in Hive database
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --hive-import
+  --hive-database <database_name>
+  --hive-table <custom_table_name>
+
+# Change datatypes of the columns in hive table
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --hive-import
+  --hive-database <database_name>
+  --hive-table <custom_table_name>
+  --map-column-hive <col_name>=<type_name>,..
+
+# Import into Hive Partitioned table.
+  # Partition column should be of type String
+  # Supports only one level of partitioning not multi-level
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --hive-import
+  --hive-database <database_name>
+  --hive-table <custom_table_name>
+  --hive-partition-key <key_column_name>
+  --hive-partition-value <key_column_value>
+
+# Handling de-limiters
+  # When the data itself contains characters that are used as Hive's delimiters, it often results in data mismatches
+  # Sqoop can automatically clean data using --hive-drop-import-delims parameter
+  # It removes all \n, \t, \01 characters from string based columns
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --hive-import
+  --hive-database <database_name>
+  --hive-table <custom_table_name>
+  --hive-drop-import-delims
+
+  # If delimiters are not to be dropped, instead need to be replaced with a string, use --hive-delims-replacement
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp 
+  --num-mappers 2
+  --hive-import
+  --hive-database <database_name>
+  --hive-table <custom_table_name>
+  --hive-delims-replacement
+
 
 
 # EXPORT DATA FROM HDFS TO DATABASE
