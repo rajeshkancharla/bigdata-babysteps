@@ -33,6 +33,16 @@ sqoop list-tables
   --password <db_user_name_password>
 
 
+# CHECK ACCESS ON TABLES
+# Run a simple SQL query to check whether the table's data is accessible
+sqoop eval 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --query "<db_query>"
+
+
 # IMPORT ALL TABLES IN A DATABASE
 # Import all the tables residing in a database
 sqoop import-all-tables
