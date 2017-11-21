@@ -35,6 +35,7 @@ sqoop list-tables
 
 # CHECK ACCESS ON TABLES
 # Run a simple SQL query to check whether the table's data is accessible
+# It is also possible to run stored procedures/functions using eval command
 sqoop eval 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
