@@ -196,5 +196,6 @@ hive> select * from b_emp tablesample(bucket 4 out of 4 on e_id);
 -- In order to check the file system from hive prompt use dfs command
 hive> dfs -ls <path_name>
 
-
+-- In order to check the table details like - where it is stored in the HDFS etc. use the below command
+hive> describe formatted <table_name>;
 
