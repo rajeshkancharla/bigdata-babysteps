@@ -223,6 +223,7 @@ sqoop import
 # COMPRESS FILES 
 # In case you don't want to use the default compression of .gz, you can specify the specific compression technique
 # --compression-codec org.apache.hadoop.io.compress.SnappyCodec: This is one of the techniques
+# this creates the files with extension as .snappy. The files are smaller in size compared to normal files
 
 sqoop import 
   --connect jdbc:mysql://<server_ip>/rajeshk 
