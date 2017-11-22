@@ -193,7 +193,8 @@ hive> select * from b_emp tablesample(bucket 3 out of 4 on e_id);
 hive> select * from b_emp tablesample(bucket 4 out of 4 on e_id);
 
 
-
+-- In order to check the file system from hive prompt use dfs command
+hive> dfs -ls <path_name>
 
 
 
