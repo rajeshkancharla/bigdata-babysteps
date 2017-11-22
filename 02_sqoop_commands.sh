@@ -220,6 +220,19 @@ sqoop import
   --compress
 
 
+# COMPRESS FILES 
+# In case you don't want to use the default compression of .gz, you can specify the specific compression technique
+# --compression-codec org.apache.hadoop.io.compress.SnappyCodec: This is one of the techniques
+
+sqoop import 
+  --connect jdbc:mysql://<server_ip>/rajeshk 
+  --driver com.mysql.jdbc.Driver 
+  --username <db_user_name> 
+  --password <db_user_name_password>
+  --table emp
+  --compress
+  --compression-codec org.apache.hadoop.io.compress.SnappyCodec
+
 # SPEED UP TRANSFER
 # Rather than using JDBC interface for transferring data, direct mode delegates the job of transferring data to the native utilities provided by database vendor.
 # MySQL uses mysqldump and mysqlimport etc. for other database vendors
