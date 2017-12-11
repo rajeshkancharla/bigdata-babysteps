@@ -23,6 +23,13 @@ ParallelCollectionRDD[6] at parallelize at PythonRDD.scala:423
 [4, 16]
 
 
+# the below file is stored in the HDFS
+#[rajeshkancharla@gw01 ~]$ hdfs dfs -cat fruits.txt
+#orange apple mango
+#apple mango orange
+#mango orange apple
+#banana
+
 >>> textRDD = sc.textFile("fruits.txt")
 
 >>> textRDD
