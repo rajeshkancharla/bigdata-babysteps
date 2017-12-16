@@ -1,3 +1,13 @@
+# Use pyspark to launch spark in the python shell
+# by default a spark context object is provided, generally as sc.
+# in order to get a SQL Context use
+from pyspark.sql import SQLContext
+# in order to get a Hive Context use
+from pyspark.sql import HiveContext
+# create the sqlContext variable using
+sqlContext = HiveContext(sc)
+
+
 # This file contain basic Python commands using pyspark
 
 >>> sampleList = [1,2,3,4,5]
