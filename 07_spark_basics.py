@@ -76,3 +76,16 @@ fruits.txt MapPartitionsRDD[11] at textFile at NativeMethodAccessorImpl.java:-2
 >>> for fruit in fruits_local.collect():
 ...    print(fruit)
 
+# accessing using the fully qualified path name
+[rajeshkancharla@gw01 ~]$ hadoop fs -ls hdfs://nn01.itversity.com:8020/user/rajeshkancharla/fruits.txt
+-rw-r--r--   3 rajeshkancharla hdfs         64 2017-12-11 08:16 hdfs://nn01.itversity.com:8020/user/rajeshkancharla/fruits.txt
+
+# load text file using fully qualified path name in HDFS
+>>> fruits_local_full=sc.textFile("hdfs://nn01.itversity.com:8020/user/rajeshkancharla/fruits.txt")
+
+>>> type(fruits_local_full)
+<class 'pyspark.rdd.RDD'>
+
+>>> for fruit in fruits_local_full.collect():
+...    print(fruit)
+
