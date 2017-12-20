@@ -57,3 +57,22 @@ fruits.txt MapPartitionsRDD[11] at textFile at NativeMethodAccessorImpl.java:-2
 >>> textRDD.flatMap(lambda line: line.split(" ")).map(lambda word: (word,1)).reduceByKey(lambda x, y: x + y).collect()
 [(u'orange', 3), (u'mango', 3), (u'apple', 3), (u'banana', 1)]
 
+# read the text file from HDFS
+# by default it reads the files from HDFS
+>>> fruits=sc.textFile("fruits.txt")
+
+>>> type(fruits)
+<class 'pyspark.rdd.RDD'>
+
+>>> for fruit in fruits.collect():
+...    print(fruit)
+
+# read a file from local unix file system
+>>> fruits_local=sc.textFile("file:///home/rajeshkancharla/fruits.txt")
+
+>>> type(fruits_local)
+<class 'pyspark.rdd.RDD'>
+
+>>> for fruit in fruits_local.collect():
+...    print(fruit)
+
