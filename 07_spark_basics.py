@@ -89,3 +89,37 @@ fruits.txt MapPartitionsRDD[11] at textFile at NativeMethodAccessorImpl.java:-2
 >>> for fruit in fruits_local_full.collect():
 ...    print(fruit)
 
+# Save the file as a sequence file
+>>> deptRDD = sc.textFile("sqoop_import/departments")
+>>> deptRDD.map(lambda x: (None,x)).saveAsSequenceFile("/user/rajeshkancharla/pyspark/departmentSeq")
+>>> deptRDD.map(lambda x: tuple(x.split(",",1))).saveAsSequenceFile("/user/rajeshkancharla/pyspark/departmentTupleSeq")
+
+# Read the data from the sequence file
+>>> deptRDD = sc.sequenceFile("pyspark/departmentTupleSeq")
+>>> deptRDD.collect()
+
+# Specifying the data types
+# first one is KEY's datatype and second one is VALUE's datatype
+>>> deptRDD = sc.sequenceFile("pyspark/departmentTupleSeq", "org.apache.hadoop.io.IntWritable", "org.apache.hadoop.io.Text")
+>>> for dept in deptRDD.collect():
+...    print(dept)
+... 
+(u'2', u'Fitness')
+(u'3', u'Footwear')
+(u'4', u'Apparel')
+(u'5', u'Golf')
+(u'6', u'Outdoors')
+(u'7', u'Fan Shop')
+
+# Reading data from Hive
+# Create the Hive Context
+from pyspark.sql import HiveContext
+sqlContext = HiveContext(sc)
+
+>>> data = sqlContext.sql("select * from rajeshk.products")
+>>> for d in data.collect():
+...    print(d)
+... 
+
+
+
