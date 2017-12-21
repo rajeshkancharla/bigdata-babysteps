@@ -121,5 +121,22 @@ sqlContext = HiveContext(sc)
 ...    print(d)
 ... 
 
+#JSON Files:
 
+>>> from pyspark.sql import SqlContext
+>>> sqlContext = SQLContext(sc)
+>>> peopleJson = sqlContext.jsonFile("pyspark/people.json")
+>>> for people in peopleJson.collect():
+...    print(people)
+... 
+
+# for creating a temporary table, use
+>>> peopleJson.registerTempTable("pjson")
+>>> for people in sqlContext.sql("Select * from pjson").collect():
+...    print(people)
+... 
+
+# writing the data to JSON format
+>>> peopleData = sqlContext.sql("Select * from pjson")
+>>> peopleData.toJSON().saveAsTextFile("pyspark/newJson")
 
