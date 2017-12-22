@@ -140,3 +140,39 @@ sqlContext = HiveContext(sc)
 >>> peopleData = sqlContext.sql("Select * from pjson")
 >>> peopleData.toJSON().saveAsTextFile("pyspark/newJson")
 
+# ==============================================================================================================================================
+# mini project for getting orders and order items details
+# get the number of orders and amount for each dat
+
+# 1. Create the RDD for Orders
+>>> ordersRDD = sc.textFile("sqoop_import/orders")
+
+# 2. Create the RDD for Order Items
+>>> orderItemsRDD = sc.textFile("sqoop_import/order_items")
+
+# 3. Parse the Orders RDD and create key-value pairs, the key is the order ID and the value is full string from Orders
+>>> ordersParsedRDD = ordersRDD.map(lambda x: (int(x.split(",")[0]), x))
+
+# 4. Parse the Order Items RDD and create key-value pairs, the key is the Order Item Order ID and the value is full string from Order Items
+>>> orderItemsParsedRDD = orderItemsRDD.map(lambda x: (int(x.split(",")[1]), x))
+
+# 5. Join the two datasets Orders and Order Items
+>>> orderJoinOrderItemsRDD = orderItemsParsedRDD.join(ordersParsedRDD)
+
+# 6. Create the dataset for (date, amount)
+>>> revenuePerOrderPerDay = orderJoinOrderItemsRDD.map(lambda x: (x[1][1].split(",")[1], float(x[1][0].split(",")[4])))
+
+# 7. Include only the orders from Order Items table as Order may also have cancelled type of status
+>>> ordersPerDay = orderJoinOrderItemsRDD.map(lambda x: x[1][1].split(",")[1] + "," + str(x[0])).distinct()
+
+# 8. Make Key Value pairs for dates
+>>> ordersPerDayParsedRDD = ordersPerDay.map(lambda x: (x.split(",")[0], 1))
+
+# 9. Add all the values so that for each date, we can get number of orders
+>>> totalOrdersPerDay = ordersPerDayParsedRDD.reduceByKey(lambda x,y: x+y)
+
+#10.Get Total Revenue per Day 
+>>> totalRevenuePerDay = revenuePerOrderPerDay.reduceByKey(lambda x,y: x+y)
+
+#11.Get total orders and total revenue per day
+>>> finalJoinRDD = totalOrdersPerDay.join(totalRevenuePerDay)
