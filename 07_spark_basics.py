@@ -142,7 +142,7 @@ sqlContext = HiveContext(sc)
 
 # ==============================================================================================================================================
 # mini project for getting orders and order items details
-# get the number of orders and amount for each dat
+# get the number of orders and amount for each date
 
 # 1. Create the RDD for Orders
 >>> ordersRDD = sc.textFile("sqoop_import/orders")
@@ -176,3 +176,47 @@ sqlContext = HiveContext(sc)
 
 #11.Get total orders and total revenue per day
 >>> finalJoinRDD = totalOrdersPerDay.join(totalRevenuePerDay)
+
+# ===================================================================================================================================
+# Using Hive
+from pyspark.sql import HiveContext
+sqlContext = HiveContext(sc)
+sqlContext.sql("set spark.sql.shuffle.partitions=10");
+
+joinAggData = sqlContext.sql("select o.order_date, round(sum(oi.order_item_subtotal), 2), \
+count(distinct o.order_id) from orders o join order_items oi \
+on o.order_id = oi.order_item_order_id \
+group by o.order_date order by o.order_date")
+
+for data in joinAggData.collect():
+  print(data)
+
+# ===================================================================================================================================
+# Using spark native sql
+from pyspark.sql import SQLContext, Row
+sqlContext = SQLContext(sc)
+sqlContext.sql("set spark.sql.shuffle.partitions=10");
+
+ordersRDD = sc.textFile("sqoop_import/orders")
+ordersMap = ordersRDD.map(lambda o: o.split(","))
+orders = ordersMap.map(lambda o: Row(order_id=int(o[0]), order_date=o[1], \
+order_customer_id=int(o[2]), order_status=o[3]))
+ordersSchema = sqlContext.inferSchema(orders)
+ordersSchema.registerTempTable("orders")
+
+orderItemsRDD = sc.textFile("sqoop_import/order_items")
+orderItemsMap = orderItemsRDD.map(lambda oi: oi.split(","))
+orderItems = orderItemsMap.map(lambda oi: Row(order_item_id=int(oi[0]), order_item_order_id=int(oi[1]), \
+order_item_product_id=int(oi[2]), order_item_quantity=int(oi[3]), order_item_subtotal=float(oi[4]), \
+order_item_product_price=float(oi[5])))
+orderItemsSchema = sqlContext.inferSchema(orderItems)
+orderItemsSchema.registerTempTable("order_items")
+
+joinAggData = sqlContext.sql("select o.order_date, sum(oi.order_item_subtotal), \
+count(distinct o.order_id) from orders o join order_items oi \
+on o.order_id = oi.order_item_order_id \
+group by o.order_date order by o.order_date")
+
+for data in joinAggData.collect():
+  print(data)
+
