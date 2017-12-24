@@ -220,3 +220,12 @@ group by o.order_date order by o.order_date")
 for data in joinAggData.collect():
   print(data)
 
+
+# Get the data of maximum valued product
+# reduce is an action
+
+productsRDD = sc.textFile("sqoop_import/products")
+productsMap = productsRDD.map(lambda rec: rec) 
+productsMap.reduce(lambda rec1, rec2: (rec1 if(float(rec1.split(",")[4]) > float(rec2.split(",")[4])) else rec2))
+
+
