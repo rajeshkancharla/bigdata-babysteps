@@ -229,3 +229,8 @@ productsMap = productsRDD.map(lambda rec: rec)
 productsMap.reduce(lambda rec1, rec2: (rec1 if(float(rec1.split(",")[4]) > float(rec2.split(",")[4])) else rec2))
 
 
+# Get the orders count based on the status
+ordersRDD = sc.textFile("sqoop_import/orders")
+ordersMap = ordersRDD.map(lambda rec: (rec.split(",")[3], 1))
+ordersMap.countByKey()
+
