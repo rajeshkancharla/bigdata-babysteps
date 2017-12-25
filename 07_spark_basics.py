@@ -234,3 +234,11 @@ ordersRDD = sc.textFile("sqoop_import/orders")
 ordersMap = ordersRDD.map(lambda rec: (rec.split(",")[3], 1))
 ordersMap.countByKey()
 
+# Using ReduceByKey
+ordersReduceBy = ordersMap.reduceByKey(lambda x,y: x+y)
+
+# Using AggregateByKey
+ordersAggregateBy = ordersMap.aggregateByKey(0, lambda acc, val: acc+1, lambda acc, val: acc + val)
+
+# Using CombineByKey
+ordersCombineBy = ordersMap.combineByKey(lambda val: 1, lambda acc, val: acc+1, lambda acc, val: acc + val)
