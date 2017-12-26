@@ -140,9 +140,10 @@ sqlContext = HiveContext(sc)
 >>> peopleData = sqlContext.sql("Select * from pjson")
 >>> peopleData.toJSON().saveAsTextFile("pyspark/newJson")
 
-# ==============================================================================================================================================
+# =======================================================================================================================================
 # mini project for getting orders and order items details
 # get the number of orders and amount for each date
+# here joins and reduceByKey for number of orders and total amount are used.
 
 # 1. Create the RDD for Orders
 >>> ordersRDD = sc.textFile("sqoop_import/orders")
@@ -220,7 +221,7 @@ group by o.order_date order by o.order_date")
 for data in joinAggData.collect():
   print(data)
 
-
+# ===================================================================================================================================
 # Get the data of maximum valued product
 # reduce is an action
 
@@ -242,4 +243,38 @@ ordersAggregateBy = ordersMap.aggregateByKey(0, lambda acc, val: acc+1, lambda a
 
 # Using CombineByKey
 ordersCombineBy = ordersMap.combineByKey(lambda val: 1, lambda acc, val: acc+1, lambda acc, val: acc + val)
-.
+
+# ===================================================================================================================================
+# mini project for getting orders and order items details
+# get the number of orders and amount for each date
+# here aggregateByKey and combineByKey are used
+
+
+ordersRDD = sc.textFile("sqoop_import/orders")
+orderItemsRDD = sc.textFile("sqoop_import/order_items")
+ordersMapRDD = ordersRDD.map(lambda rec: (int(rec.split(",")[0]), rec))
+orderItemsMapRDD = orderItemsRDD.map(lambda rec: (int(rec.split(",")[1]), rec))
+ordersJoinOrderItems = ordersMapRDD.join(orderItemsMapRDD)
+ordersJoinOrderItemsMap = ordersJoinOrderItems.map(lambda rec: ((rec[1][0].split(",")[1], int(rec[0])), float(rec[1][1].split(",")[4])))
+revenuePerDayPerOrder = ordersJoinOrderItemsMap.reduceByKey(lambda x, y: x+y)
+revenuePerDayPerOrderMap = revenuePerDayPerOrder.map(lambda rec: (rec[0][0], rec[1]))
+
+# revenuePerDay = revenuePerDayPerOrderMap.reduceByKey(lambda x,y: x+y)
+# ordersPerDay = revenuePerDayPerOrderMap.countByKey()
+
+# using combineByKey
+revenuePerDay = revenuePerDayPerOrderMap.combineByKey( \
+lambda x: (x, 1), \
+lambda acc, revenue: (acc[0] + revenue, acc[1] + 1), \
+lambda total1, total2: (round(total1[0] + total2[0], 2), total1[1] + total2[1]) \
+)
+
+# using aggregateByKey
+revenuePerDay = revenuePerDayPerOrderMap.aggregateByKey( \
+(0, 0), \
+lambda acc, revenue: (acc[0] + revenue, acc[1] + 1), \
+lambda total1, total2: (round(total1[0] + total2[0], 2), total1[1] + total2[1]) \
+)
+
+avgRevenuePerDay = revenuePerDay.map(lambda x: (x[0], x[1][0]/x[1][1]))
+
