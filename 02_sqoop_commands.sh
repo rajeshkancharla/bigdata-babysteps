@@ -202,7 +202,7 @@ sqoop import
   --driver com.mysql.jdbc.Driver 
   --username <db_user_name> 
   --password <db_user_name_password>
-  --table emp
+  --table emp 
   --as-avrodatafile
 
 
