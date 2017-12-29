@@ -49,13 +49,16 @@ hive> USE rajeshk;
 
 /* Create Managed / Internal Table */
 -- This statement creates a folder with the name as table name. 
+-- Folder name with the table: /apps/hive/warehouse/rajeshk.db/employee
 -- However there will be no files under this folder because data is not there yet.
 hive> create table employee (e_id int, e_name string, e_dept string, e_salary int) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
 
 /* Load Data from HDFS directory */
--- While using the managed table, the data gets moved from the source file path to hive.
+-- While using the managed table, the data gets moved from the source file path to the hive path.
 -- The source file gets removed as it's virtually moved from source path to hive path
 -- In the below example, the hive_files is a directory in the HDFS which contains the file emp.txt
+-- Effectively file moves from ~/hive_files to /apps/hive/warehouse/rajeshk.db/employee
+-- File Path in HDFS: /apps/hive/warehouse/rajeshk.db/employee/emp.txt
 hive> load data inpath 'hive_files/emp.txt' into table employee;
 
 /* Load Data from Local directory */
@@ -85,8 +88,11 @@ hive> select e_name, d_name from employee JOIN dept on e_dept = d_id;
 hive> select * from employee order by e_dept;
 
 /* Internal vs External */
--- Internal tables are linked to the file in the HDFS. When the table is dropped, the metadata of the table and the data are gone
--- External tables are not linked to the file. Even if table is dropped, the data still remains.
+-- Internal tables are linked to the file in the HDFS in the Hive WareHouse Directory. 
+-- When the internal table is dropped, the metadata of the table and the data are gone
+-- External tables are not linked to the file in the HDFS in the Hive Warehouse Directory. 
+-- External tables can point to any folder in HDFS (LOCATION).
+-- Even if external table is dropped, the data still remains.
 
 /* External Table */
 create external table ex_test (user_id int, common_name string, user_type string, gender string, country string, state string, freq string, year int, month int, day int) 
