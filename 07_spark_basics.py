@@ -278,3 +278,11 @@ lambda total1, total2: (round(total1[0] + total2[0], 2), total1[1] + total2[1]) 
 
 avgRevenuePerDay = revenuePerDay.map(lambda x: (x[0], x[1][0]/x[1][1]))
 
+# ===================================================================================================================================
+# Data Frames
+
+ordersDF = sqlContext.read.format("com.databricks.spark.avro").load("problem1/orders")
+
+orderItemsDF = sqlContext.read.format("com.databricks.spark.avro").load("problem1/order_items")
+
+orderJoin = ordersDF.join(orderItemsDF, ordersDF.order_id == orderItemsDF.order_item_order_id)
