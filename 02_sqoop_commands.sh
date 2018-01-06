@@ -247,6 +247,19 @@ sqoop import
   --table emp
   --direct
 
+# Delimiters and NULL values
+# null-non-string is for non-string values and null-string is for null values
+
+sqoop import \
+  --connect jdbc:mysql://<server_ip>/rajeshk \
+  --driver com.mysql.jdbc.Driver \ 
+  --username <db_user_name> \
+  --password <db_user_name_password> \
+  --table employees \
+  --warehouse-dir /user/rajeshkancharla/hr_db \
+  --null-non-string "-1" \
+  --fields-terminated-by "\t" \
+  --lines-terminated-by ":"
 
 # OVERRIDE TYPE MAPPING
 # The default mapping works, however in order to override the mapping, the --map-column-java parameter is used.
