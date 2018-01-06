@@ -281,13 +281,16 @@ avgRevenuePerDay = revenuePerDay.map(lambda x: (x[0], x[1][0]/x[1][1]))
 # ===================================================================================================================================
 # Data Frames
 
-# below commands use load function to create a dataframe directly
+# TEXT
 sqlContext.load("/public/retail_db/order_items", "text").show()
+
+#JSON
 sqlContext.load("/public/retail_db_json/order_items", "json").show()
+sqlContext.read.json("/public/retail_db_json/order_items").show()
 
-
+#AVRO
 ordersDF = sqlContext.read.format("com.databricks.spark.avro").load("problem1/orders")
-
 orderItemsDF = sqlContext.read.format("com.databricks.spark.avro").load("problem1/order_items")
 
+#Join Data Frames
 orderJoin = ordersDF.join(orderItemsDF, ordersDF.order_id == orderItemsDF.order_item_order_id)
