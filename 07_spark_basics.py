@@ -1,4 +1,5 @@
 # Use pyspark to launch spark in the python shell
+pyspark --master yarn --conf spark.ui.port=12888
 # by default a spark context object is provided, generally as sc.
 # in order to get a SQL Context use
 from pyspark.sql import SQLContext
