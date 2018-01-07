@@ -299,6 +299,15 @@ orderJoin = ordersDF.join(orderItemsDF, ordersDF.order_id == orderItemsDF.order_
 
 
 # ====================================================================================================================================
+# As a Spark Program
+
+from pyspark import SparkContext, SQLContext
+conf = SparkConf().setAppName("App Name")
+sc = sparkContext(conf = conf)
+
+
+
+# ====================================================================================================================================
 # Typical Life Cycle
 
 #OPTION 1 : HIVE Table
