@@ -205,3 +205,12 @@ hive> dfs -ls <path_name>
 -- In order to check the table details like - where it is stored in the HDFS etc. use the below command
 hive> describe formatted <table_name>;
 
+-- In order to see all vailable functions
+hive> show functions;
+
+-- In order to get help on specific function
+hive> describe function <function_name>;
+
+
+-- In order to sort revenues based on a date group, after the group by query, use below
+distribute by o.order_date sort by o.order_date, order_revenue desc
