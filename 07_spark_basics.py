@@ -294,3 +294,55 @@ orderItemsDF = sqlContext.read.format("com.databricks.spark.avro").load("problem
 
 #Join Data Frames
 orderJoin = ordersDF.join(orderItemsDF, ordersDF.order_id == orderItemsDF.order_item_order_id)
+
+
+# ====================================================================================================================================
+# Typical Life Cycle
+
+#OPTION 1 : HIVE Table
+# When there is Hive table, a data frame can directly be created using sqlContext.sql("select * from table")
+>>> ordersDF = sqlContext.sql("select * from rajeshk.orders")
+
+#OPTION 2 : MYSQL Table
+# When the table is in mysql, import into HDFS using Sqoop and perform hive import
+sqoop import \
+  --connect jdbc:mysql://ms.itversity.com/hr_db \
+  --username hr_user \
+  --password itversity \
+  --table orders \
+  --table emp \
+  --num-mappers 1 \
+  --hive-import \
+  --hive-database rajeshk \
+  --hive-table orders
+# When the Hive table is created, a data frame can directly be created using sqlContext.sql("select * from table")
+>>> ordersDF = sqlContext.sql("select * from rajeshk.orders")
+
+#OPTION 3: Local File
+>>> from pyspark.sql import Row
+>>> ordersRaw = open("/path/to/local/orders/file").read().splitlines()
+>>> ordersRDD = sc.parallelize(productsRaw)
+>>> ordersDF = ordersRDD.map(lambda rec: Row(order_id=int(rec.split(",")[0]), order_date=rec.split(",")[1], order_customer=int(rec.split(",")[2]), order_status=rec.split(",")[3])).toDF()
+
+#OPTION 4: HDFS File
+>>> from pyspark.sql import Row
+>>> ordersRDD = sc.textFile("/path/to/hdfs/orders/folder")
+>>> ordersDF = ordersRDD.map(lambda rec: Row(order_id=int(rec.split(",")[0]), order_date=rec.split(",")[1], order_customer=int(rec.split(",")[2]), order_status=rec.split(",")[3])).toDF()
+
+
+# Data Frame Operations:
+# After ordersDF is created, a temporary dataframe table can be created using ordersDF.registerTempTable("ordersDF_table")
+# Data frame table data can be accessed using
+>>> sqlContext.sql("select * from ordersDF_table")
+# Perform the required operations on this dataframe table and store the result back into another dataframe
+>>> postOrdersDF = sqlContext.sql("select count(*), order_state from ordersDF_table group by order_state")
+
+#Write to table / hdfs
+# use the DF to save to another Hive table / HDFS  
+# Write dataFrame output to an existing hive table
+>>> ordersDF.insertInto("rajeshk.orders_new")
+# Write dataFrame output to a new table in Hive
+>>>		ordersDF.saveAsTable("rajeshk.orders_new1")
+# Write dataFrame output to a folder in HDFS 
+>>>	ordersDF.save("ordersJson", "json")
+>>>	ordersDF.write.json("ordersJsonDirect")
