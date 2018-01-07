@@ -29,3 +29,7 @@ wh.channels.mem.transactionCapacity = 100
 # Bind the source and sink to the channel
 wh.sources.ws.channels = mem
 wh.sinks.hd.channel = mem
+
+
+-- Run Flume Service
+flume-ng agent --name wh --conf-file /home/rajeshkancharla/flume_demo/wslogstohdfs/wshdfs.conf
