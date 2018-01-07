@@ -343,6 +343,16 @@ sqoop import \
 >>> ordersDF.insertInto("rajeshk.orders_new")
 # Write dataFrame output to a new table in Hive
 >>>		ordersDF.saveAsTable("rajeshk.orders_new1")
+
 # Write dataFrame output to a folder in HDFS 
+# JSON
 >>>	ordersDF.save("ordersJson", "json")
 >>>	ordersDF.write.json("ordersJsonDirect")
+
+# ORC
+>>> ordersDF.save("ordersORC", "orc")
+>>> ordersDF.write.orc("ordersORCDirect")		
+
+# PARQUET
+>>> ordersDF.save("ordersParquet", "parquet")
+>>>ordersDF.write.parquet("ordersParquetDirect")
