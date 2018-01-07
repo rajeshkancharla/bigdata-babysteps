@@ -359,11 +359,25 @@ sqoop import \
 # JSON
 >>>	ordersDF.save("ordersJson", "json")
 >>>	ordersDF.write.json("ordersJsonDirect")
+dataFrame.toJSON().saveAsTextFile(<path to location>,classOf[Compression Codec])
 
 # ORC
 >>> ordersDF.save("ordersORC", "orc")
 >>> ordersDF.write.orc("ordersORCDirect")		
+df.write.mode(SaveMode.Overwrite).format("orc") .save(<path to location>)
 
 # PARQUET
 >>> ordersDF.save("ordersParquet", "parquet")
 >>>ordersDF.write.parquet("ordersParquetDirect")
+
+#============================================================================
+# didn't work
+# CSV
+ordersDF.write.csv("ordersCSV", header="true", mode="overwrite")
+ordersDF.write.format('com.databricks.spark.csv').mode('overwrite').option("header", "true").save("ordersCSV")
+
+# AVRO
+ordersDF.save("ordersAvro", "avro")
+ordersDF.write.avro("ordersAvroDirect")
+sqlContext.setConf("spark.sql.avro.compression.codec","snappy") //use snappy, deflate, uncompressed;
+dataFrame.write.avro(<path to location>);
