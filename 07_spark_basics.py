@@ -178,6 +178,8 @@ sqlContext = HiveContext(sc)
 #11.Get total orders and total revenue per day
 >>> finalJoinRDD = totalOrdersPerDay.join(totalRevenuePerDay)
 
+# this command is to check the Direct Acyclic Graph (DAG) of all the list of transformations in sequence
+revenuePerOrder.toDebugString()
 # ===================================================================================================================================
 # Using Hive
 from pyspark.sql import HiveContext
