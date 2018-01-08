@@ -1,0 +1,133 @@
+-----------------------------------------------------------------------------------------------------------------------------
+Products.csv
+
+>>> productsRDD = sc.textFile("/user/rajeshkancharla/products.csv")
+>>> for i in productsRDD.collect(): print(i)
+>>> from pyspark.sql import Row
+>>> productsDF = productsRDD.map(lambda rec: Row(productID = int(rec.split(",")[0]), productCode = rec.split(",")[1], 
+productName = rec.split(",")[2], quantity = int(rec.split(",")[3]), price = float(rec.split(",")[4]))).toDF()
+>>> productsDF.show()
+>>> productsDF.registerTempTable("productsDF")
+>>> sqlContext.sql("CREATE TABLE rajeshk.products_orc_table STORED AS ORC AS SELECT * FROM productsDF")
+>>> sqlContext.sql("CREATE TABLE rajeshk.products_parquet_table STORED AS PARQUET AS SELECT * FROM productsDF")
+
+-----------------------------------------------------------------------------------------------------------------------------
+Departments Data in 4 different formats:
+
+sqoop import \
+ --connect jdbc:mysql://ms.itversity.com/retail_db \
+ --username retail_user \
+ --password itversity \
+ --table departments \
+ --target-dir /user/rajeshkancharla/departments_text \
+ --num-mappers 1 \
+ --as-textfile
+
+sqoop import \
+ --connect jdbc:mysql://ms.itversity.com/retail_db \
+ --username retail_user \
+ --password itversity \
+ --table departments \
+ --target-dir /user/rajeshkancharla/departments_sequence \
+ --num-mappers 1 \
+ --as-sequencefile
+
+sqoop import \
+ --connect jdbc:mysql://ms.itversity.com/retail_db \
+ --username retail_user \
+ --password itversity \
+ --table departments \
+ --target-dir /user/rajeshkancharla/departments_avro \
+ --num-mappers 1 \
+ --as-avrodatafile
+
+sqoop import \
+ --connect jdbc:mysql://ms.itversity.com/retail_db \
+ --username retail_user \
+ --password itversity \
+ --table departments \
+ --target-dir /user/rajeshkancharla/departments_parquet \
+ --num-mappers 1 \
+ --as-parquetfile
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+1001,Ah Teck,1991-12-31,2012-01-20
+1002,Kumar,2011-10-29,2012-09-20
+1003,Ali,2011-01-30,2012-10-21
+
+>>> from pyspark.sql import Row
+>>> patientsRDD = sc.textFile("/user/rajeshkancharla/patient.csv")
+>>> patientsDF = patientsRDD.map(lambda rec: Row(patientID = int(rec.split(",")[0]), patientName = rec.split(",")[1], 
+dateOfBirth = rec.split(",")[2], lastVisitDate = rec.split(",")[3])).toDF()
+>>> patientsDF.show()
+>>> patientsDF.registerTempTable("patients")
+>>> sqlContext.sql("select * from patients").show()
+
+Visit date between dates
+>>> sqlContext.sql("SELECT * FROM patients WHERE DATE_FORMAT(lastVisitDate, 'YYYY-MM-DD') 
+BETWEEN DATE_FORMAT('2012-09-15', 'YYYY-MM-DD') AND current_date").show()
+
+Born in 2011
+>>> sqlContext.sql("SELECT * FROM patients WHERE DATE_FORMAT(dateOfBirth, 'YYYY') = '2011'").show()
+
+Age
+>>> sqlContext.sql("select datediff(current_date, to_date(cast(unix_timestamp(dateOfBirth,'YYYY-MM-DD') as timestamp)))/365 
+from patients").show()
+
+sqlContext.sql("select * from patients where datediff(current_date, 
+to_date(cast(unix_timestamp(lastVisitDate,'YYYY-MM-DD') as timestamp))) > 60").show()
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+people = []
+people.append({'name':'Amit', 'age':45,'gender':'M'})
+people.append({'name':'Ganga', 'age':43,'gender':'F'})
+people.append({'name':'John', 'age':28,'gender':'M'})
+people.append({'name':'Lolita', 'age':33,'gender':'F'})
+people.append({'name':'Dont Know', 'age':18,'gender':'T'})
+peopleRdd=sc.parallelize(people) //Create an RDD
+seqOp = (lambda x,y: (x[0] + y['age'],x[1] + 1))
+combOp = (lambda x,y: (x[0] + y[0], x[1] + y[1]))
+peopleRdd.aggregate((0,0), seqOp, combOp) //
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+sqoop import \
+ --connect jdbc:mysql://ms.itversity.com/retail_db \
+ --username retail_user \
+ --password itversity \
+ --table departments \
+ --hive-import \
+ --hive-database rajeshk \
+ --hive-table departments_hive \
+ --hive-overwrite \
+ --hive-home /user/rajeshkancharla/hive_warehouse \
+ --fields-terminated-by '\001'
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+val grouped = sc.parallelize(Seq(((1,"two"), List((3,4), (5,6)))))
+val flattened = grouped.flatMap{case(key, groupValues) => groupValues.map { value => (key._1, key._2, value._1, value._2) }} 
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+spark-submit \
+--class <class name> \
+--master yarn \
+--deploy-mode cluster \
+--executor-memory 20G \
+--total-executor-cores 100 \
+--conf \
+--supervise \
+--num-executors 50 \
+/path/to/hadoop/jar \
+1000
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+val one = sc.textFile("spark16/file1.txt").map{_.split(",",-1) match {case Array(a, b, c) => (a, ( b, c))} }
+val two = sc.textFile("spark16/file2.txt").map{_.split(",",-1) match {case Array(a, b, c) => (a, (b, c))} }
+val joined = one.join(two)
+val sum = joined.map {case (_, ((_, num2), (_, _))) => num2.toInt}.reduce(_ + _)
