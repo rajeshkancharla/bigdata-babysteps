@@ -382,3 +382,11 @@ ordersDF.save("ordersAvro", "avro")
 ordersDF.write.avro("ordersAvroDirect")
 sqlContext.setConf("spark.sql.avro.compression.codec","snappy") //use snappy, deflate, uncompressed;
 dataFrame.write.avro(<path to location>);
+
+
+avro file
+pyspark --packages com.databricks:spark-avro_2.10:2.0.1
+import com.databricks.spark.avro._
+import sqlContext.implicits._
+
+df = sqlContext.read.format("com.databricks.spark.avro").load("kv.avro")
