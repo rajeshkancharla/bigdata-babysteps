@@ -21,7 +21,7 @@ sqlContext.sql("set spark.sql.shuffle.partitions=10");
 fullDataDF = sqlContext.sql("select customers_df.customer_name as name, round(sum(order_items_df.order_item_subtotal),2) as amount from orders_df, order_items_df, customers_df where orders_df.order_id = order_items_df.order_item_id and orders_df.order_customer_id = customers_df.customer_id group by customers_df.customer_name")
 
 # ===================================================================================================================================================================================================================================================================================================================================================================
-# TEXT
+# WRITE TO TEXT FILE
 # save as text file output with tab as delimiter
 fullDataDF.rdd.map(lambda rec: "\t".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("customer_orders_text_tab_data")
 
@@ -47,6 +47,7 @@ fullDataDF.write.parquet("customer_orders_parquet_snappy")
 # READ FROM PARQUET FILE
 # file can be read irrespective of compression
 parquetDF = sqlContext.read.parquet("customer_orders_parquet_uncomp")
+parquetDF = sqlContext.read.format("parquet").load("customer_orders_parquet_uncomp")
 
 # ===================================================================================================================================================================================================================================================================================================================================================================
 # WRITE TO JSON FILE
@@ -59,6 +60,7 @@ fullDataDF.toJSON().coalesce(1).saveAsTextFile("customer_orders_json_snappy", "o
 # READ FROM JSON FILE
 # file can be read irrespective of compression
 jsonDF = sqlContext.read.json("customer_orders_json_snappy")
+jsonDF = sqlContext.read.format("json").load("customer_orders_json_snappy")
 
 # ===================================================================================================================================================================================================================================================================================================================================================================
 # WRITE TO ORC FILE
@@ -71,6 +73,7 @@ fullDataDF.write.format("orc").save("customer_orders_orc_snappy")
 # READ FROM ORC FILE
 # file can be read irrespective of compression
 orcDF = sqlContext.read.orc("customer_orders_orc_snappy")
+orcDF = sqlContext.read.format("orc").load("customer_orders_orc_snappy")
 
 # ===================================================================================================================================================================================================================================================================================================================================================================
 # WRITE TO AVRO FILE

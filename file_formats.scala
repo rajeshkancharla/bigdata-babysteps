@@ -52,6 +52,7 @@ fullDataDF.write.parquet("scala_customer_orders_parquet_snappy")
 // READ FROM PARQUET FILE
 // file can be read irrespective of compression
 val parquetDF = sqlContext.read.parquet("scala_customer_orders_parquet_snappy")
+val parquetDF = sqlContext.read.format("parquet").load("scala_customer_orders_parquet_snappy")
 
 // ===================================================================================================================================================================================================================================================================================================================================================================
 // WRITE TO JSON FILE
@@ -64,6 +65,7 @@ fullDataDF.toJSON.coalesce(1).saveAsTextFile("scala_customer_orders_json_snappy"
 // READ FROM JSON FILE
 // file can be read irrespective of compression
 val jsonDF = sqlContext.read.json("scala_customer_orders_json")
+val jsonDF = sqlContext.read.format("json").load("scala_customer_orders_json")
 
 // ===================================================================================================================================================================================================================================================================================================================================================================
 // WRITE TO ORC FILE
@@ -76,6 +78,7 @@ fullDataDF.write.format("orc").save("scala_customer_orders_orc_snappy")
 // READ FROM ORC FILE
 // file can be read irrespective of compression
 val orcDF = sqlContext.read.orc("scala_customer_orders_orc")
+val orcDF = sqlContext.read.format("orc").load("scala_customer_orders_orc")
 // ===================================================================================================================================================================================================================================================================================================================================================================
 // WRITE TO AVRO FILE
 // save as avro file
