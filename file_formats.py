@@ -19,7 +19,7 @@ customersDF.registerTempTable("customers_df")
 sqlContext.sql("set spark.sql.shuffle.partitions=10");
 
 fullDataDF = sqlContext.sql("select customers_df.customer_name as name, round(sum(order_items_df.order_item_subtotal),2) as amount from orders_df, order_items_df, customers_df where orders_df.order_id = order_items_df.order_item_id and orders_df.order_customer_id = customers_df.customer_id group by customers_df.customer_name")
-
+ 
 # ===================================================================================================================================================================================================================================================================================================================================================================
 # WRITE TO TEXT FILE
 # save as text file output with tab as delimiter
@@ -32,7 +32,7 @@ fullDataDF.rdd.map(lambda rec: "|".join([str(x) for x in rec])).coalesce(1).save
 fullDataDF.rdd.map(lambda rec: ",".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("customer_orders_text_csv_data", "org.apache.hadoop.io.compress.SnappyCodec")
 
 # ===================================================================================================================================================================================================================================================================================================================================================================
-# WRITE TO PARQUET FILE
+# WRITE TO PARQUET FILE 
 # save as parquet file with default compression as gz
 fullDataDF.write.parquet("customer_orders_parquet")
 
