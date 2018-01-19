@@ -35,7 +35,7 @@ fullDataDF.rdd.map(rec => rec.mkString(" \t ")).coalesce(1).saveAsTextFile("scal
 // save as text file output with comma as delimiter (CSV)
 fullDataDF.rdd.map(rec => rec.mkString(" , ")).coalesce(1).saveAsTextFile("scala_customer_orders_text_comma_data")
 fullDataDF.rdd.map(rec => rec.mkString(" , ")).coalesce(1).saveAsTextFile("scala_customer_orders_text_comma_data", classOf[org.apache.hadoop.io.compress.SnappyCodec])
-
+ 
 // ===================================================================================================================================================================================================================================================================================================================================================================
 // WRITE TO PARQUET FILE
 // save as parquet file with default compression as gz
