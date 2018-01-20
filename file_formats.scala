@@ -1,5 +1,5 @@
 spark-shell --master yarn --conf spark.ui.port=12345 –num-executors 10 –executor-cores 2 –executor-memory 3G –packages com.databricks:spark-avro_2.10:2.0.1
-
+spark-shell --packages com.databricks:spark-csv_2.11:1.2.0
 
 val ordersRDD = sc.textFile("sqoop_import/orders")
 case class Orders(order_id: Integer, order_date: String, order_customer_id: Integer, order_status: String)
@@ -35,7 +35,7 @@ fullDataDF.rdd.map(rec => rec.mkString(" \t ")).coalesce(1).saveAsTextFile("scal
 // save as text file output with comma as delimiter (CSV)
 fullDataDF.rdd.map(rec => rec.mkString(" , ")).coalesce(1).saveAsTextFile("scala_customer_orders_text_comma_data")
 fullDataDF.rdd.map(rec => rec.mkString(" , ")).coalesce(1).saveAsTextFile("scala_customer_orders_text_comma_data", classOf[org.apache.hadoop.io.compress.SnappyCodec])
- 
+
 // ===================================================================================================================================================================================================================================================================================================================================================================
 // WRITE TO PARQUET FILE
 // save as parquet file with default compression as gz
@@ -57,6 +57,7 @@ val parquetDF = sqlContext.read.format("parquet").load("scala_customer_orders_pa
 // ===================================================================================================================================================================================================================================================================================================================================================================
 // WRITE TO JSON FILE
 // save as json output file
+fullDataDF.write.format("json").save("scala_customer_orders_direct_json")
 fullDataDF.toJSON.coalesce(1).saveAsTextFile("scala_customer_orders_json")
 
 // save as json output file with Snappy Compression

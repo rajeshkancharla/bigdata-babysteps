@@ -19,11 +19,11 @@ customersDF.registerTempTable("customers_df")
 sqlContext.sql("set spark.sql.shuffle.partitions=10");
 
 fullDataDF = sqlContext.sql("select customers_df.customer_name as name, round(sum(order_items_df.order_item_subtotal),2) as amount from orders_df, order_items_df, customers_df where orders_df.order_id = order_items_df.order_item_id and orders_df.order_customer_id = customers_df.customer_id group by customers_df.customer_name")
- 
+
 # ===================================================================================================================================================================================================================================================================================================================================================================
 # WRITE TO TEXT FILE
 # save as text file output with tab as delimiter
-fullDataDF.rdd.map(lambda rec: "\t".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("customer_orders_text_tab_data")
+fullDataDF.rdd.map(lambda rec: "\t".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("pyspark_customer_orders_text_tab_data")
 
 # save as text file output with pipe as delimiter
 fullDataDF.rdd.map(lambda rec: "|".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("customer_orders_text_pipe_data")
@@ -31,8 +31,11 @@ fullDataDF.rdd.map(lambda rec: "|".join([str(x) for x in rec])).coalesce(1).save
 # save as text file output with pipe as delimiter
 fullDataDF.rdd.map(lambda rec: ",".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("customer_orders_text_csv_data", "org.apache.hadoop.io.compress.SnappyCodec")
 
+
+fullDataRDD = sc.textFile("pyspark_customer_orders_text_tab_data")
+fullDataMap = fullDataRDD.map(lambda rec: (rec.split("\t")[0], rec.split("\t")[1]))
 # ===================================================================================================================================================================================================================================================================================================================================================================
-# WRITE TO PARQUET FILE 
+# WRITE TO PARQUET FILE
 # save as parquet file with default compression as gz
 fullDataDF.write.parquet("customer_orders_parquet")
 
@@ -52,6 +55,8 @@ parquetDF = sqlContext.read.format("parquet").load("customer_orders_parquet_unco
 # ===================================================================================================================================================================================================================================================================================================================================================================
 # WRITE TO JSON FILE
 # save as json output file
+fullDataDF.write.format("json").save("pyspark_customer_orders_direct_json")
+
 fullDataDF.toJSON().coalesce(1).saveAsTextFile("customer_orders_json")
 
 # save as json output file with Snappy Compression
