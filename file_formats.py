@@ -1,43 +1,55 @@
-pyspark --master yarn --conf spark.ui.port=12345 –num-executors 10 –executor-cores 2 –executor-memory 3G –packages com.databricks:spark-avro_2.10:2.0.1
+# Launch Pyspark
+# pyspark --master yarn --conf spark.ui.port=12345 –num-executors 10 –executor-cores 2 –executor-memory 3G –packages com.databricks:spark-avro_2.10:2.0.1
 pyspark --master yarn --num-executors 10 --packages com.databricks:spark-avro_2.10:2.0.1
 
 from pyspark import Row
 
 ordersRDD = sc.textFile("sqoop_import/orders")
-ordersDF = ordersRDD.map(lambda rec: Row(order_id = int(rec.split(",")[0]), order_date = rec.split(",")[1], order_customer_id = 
-                                         int(rec.split(",")[2]), order_status = rec.split(",")[3])).toDF()
+ordersDF = ordersRDD.map(lambda rec: Row(order_id = int(rec.split(",")[0]), 
+                                         order_date = rec.split(",")[1], 
+                                         order_customer_id = int(rec.split(",")[2]), 
+                                         order_status = rec.split(",")[3])).toDF()
 ordersDF.registerTempTable("orders_df")
 
 orderItemsRDD = sc.textFile("sqoop_import/order_items")
-orderItemsDF = orderItemsRDD.map(lambda rec: Row(order_item_id = int(rec.split(",")[0]), order_item_order_id = int(rec.split(",")[1]), 
-                                                 order_item_product_id = int(rec.split(",")[2]), order_item_quantity = 
-                                                 int(rec.split(",")[3]), order_item_subtotal = float(rec.split(",")[4]), 
+orderItemsDF = orderItemsRDD.map(lambda rec: Row(order_item_id = int(rec.split(",")[0]), 
+                                                 order_item_order_id = int(rec.split(",")[1]), 
+                                                 order_item_product_id = int(rec.split(",")[2]), 
+                                                 order_item_quantity = int(rec.split(",")[3]), 
+                                                 order_item_subtotal = float(rec.split(",")[4]), 
                                                  order_item_product_price = float(rec.split(",")[5]))).toDF()
 orderItemsDF.registerTempTable("order_items_df")
 
 customersRDD = sc.textFile("sqoop_import/customers")
-customersDF = customersRDD.map(lambda rec: Row(customer_id = int(rec.split(",")[0]), customer_name = rec.split(",")[1] + ", " + 
-                                               rec.split(",")[2])).toDF()
+customersDF = customersRDD.map(lambda rec: Row(customer_id = int(rec.split(",")[0]), 
+                                               customer_name = rec.split(",")[1] + ", " 
+                                                               + rec.split(",")[2])).toDF()
 customersDF.registerTempTable("customers_df")
 
 # set number of shuffle partitions to 10
 sqlContext.sql("set spark.sql.shuffle.partitions=10");
 
-fullDataDF = sqlContext.sql("select customers_df.customer_name as name, round(sum(order_items_df.order_item_subtotal),2) as amount from 
-                            orders_df, order_items_df, customers_df where orders_df.order_id = order_items_df.order_item_id and 
-                            orders_df.order_customer_id = customers_df.customer_id group by customers_df.customer_name")
+fullDataDF = sqlContext.sql("select customers_df.customer_name as name, 
+                            round(sum(order_items_df.order_item_subtotal),2) as amount 
+                            from orders_df, order_items_df, customers_df 
+                            where orders_df.order_id = order_items_df.order_item_id 
+                            and orders_df.order_customer_id = customers_df.customer_id 
+                            group by customers_df.customer_name")
 
 # ===================================================================================================================================================================================================================================================================================================================================================================
 # WRITE TO TEXT FILE
 # save as text file output with tab as delimiter
-fullDataDF.rdd.map(lambda rec: "\t".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("pyspark_customer_orders_text_tab_data")
+fullDataDF.rdd.map(lambda rec: "\t".join([str(x) for x in rec]))
+                            .coalesce(1).saveAsTextFile("pyspark_customer_orders_text_tab_data")
 
 # save as text file output with pipe as delimiter
-fullDataDF.rdd.map(lambda rec: "|".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("customer_orders_text_pipe_data")
+fullDataDF.rdd.map(lambda rec: "|".join([str(x) for x in rec]))
+                            .coalesce(1).saveAsTextFile("customer_orders_text_pipe_data")
 
 # save as text file output with pipe as delimiter
-fullDataDF.rdd.map(lambda rec: ",".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("customer_orders_text_csv_data", 
-                                                                                           "org.apache.hadoop.io.compress.SnappyCodec")
+fullDataDF.rdd.map(lambda rec: ",".join([str(x) for x in rec]))
+                            .coalesce(1).saveAsTextFile("customer_orders_text_csv_data",
+                                                        "org.apache.hadoop.io.compress.SnappyCodec")
 
 
 fullDataRDD = sc.textFile("pyspark_customer_orders_text_tab_data")
@@ -68,7 +80,8 @@ fullDataDF.write.format("json").save("pyspark_customer_orders_direct_json")
 fullDataDF.toJSON().coalesce(1).saveAsTextFile("customer_orders_json")
 
 # save as json output file with Snappy Compression
-fullDataDF.toJSON().coalesce(1).saveAsTextFile("customer_orders_json_snappy", "org.apache.hadoop.io.compress.SnappyCodec")
+fullDataDF.toJSON().coalesce(1).saveAsTextFile("customer_orders_json_snappy", 
+                                               "org.apache.hadoop.io.compress.SnappyCodec")
 
 # READ FROM JSON FILE
 # file can be read irrespective of compression
