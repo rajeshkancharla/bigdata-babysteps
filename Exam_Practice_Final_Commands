@@ -1,0 +1,190 @@
+# Import all tables into a warehouse directory
+	sqoop import-all-tables \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --warehouse-dir sqoop_import
+
+# Import as text file
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_text_comma \
+	 --as-textfile 
+
+# Import as text file with snappy compression
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_text_snappy \
+	 --as-textfile \
+	 --compress \
+	 --compression-codec "org.apache.hadoop.io.compress.SnappyCodec"
+
+# Import as tab delimited
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_text_tab \
+	 --as-textfile \
+	 --fields-terminated-by "\t"
+
+# Import as pipe delimited
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_text_pipe \
+	 --as-textfile \
+	 --fields-terminated-by "|" 
+
+# Import as sequence
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_sequence \
+	 --as-sequencefile 
+ 
+ # Import as sequence with compression as GZIP
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_sequence_gzip \
+	 --as-sequencefile \
+	 --compress \
+	 --compression-codec "org.apache.hadoop.io.compress.GzipCodec"
+
+# Import as Parquet
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_parquet \
+	 --as-parquetfile 
+ 
+ # Import as Parquet with compression as Snappy
+ 	# When compression of BZIP/GZIP/SNAPPY/DEFAULT is used, the output files are still created as .parquet
+ 	# Tried to create parquet hive table, still the compression is not visible
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_parquet_snappy \
+	 --as-parquetfile \
+	 --compress \
+	 --compression-codec "org.apache.hadoop.io.compress.SnappyCodec"
+
+ 	CREATE EXTERNAL TABLE order_item_parquet (order_item_id int, order_item_order_id int, order_item_product_id int, order_item_quantity int, order_item_subtotal float, order_item_product_price float) STORED AS PARQUET LOCATION 'hdfs://nn01.itversity.com:8020/user/rajeshkancharla/order_items_parquet_snappy';
+
+
+# Import as Avro
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_avro \
+	 --as-avrodatafile 
+
+ # Import as Avro and compression
+  	# When compression of BZIP/GZIP/DEFAULT is used, the sqoop command failed as they are not supported
+  	# Only Snappy as compression has worked
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_avro_snappy \
+	 --as-avrodatafile \
+	 --compress \
+	 --compression-codec "org.apache.hadoop.io.compress.SnappyCodec"
+
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_avro_gzip \
+	 --as-avrodatafile \
+	 --compress \
+	 --compression-codec "org.apache.hadoop.io.compress.Default"
+
+	CREATE EXTERNAL TABLE order_items_avro (order_item_id int, order_item_order_id int, order_item_product_id int, order_item_quantity int, order_item_subtotal float, order_item_product_price float) 
+	STORED AS AVRO
+	LOCATION 'hdfs://nn01.itversity.com:8020/user/rajeshkancharla/order_items_avro_snappy'
+	TBLPROPERTIES('avro.schema.file'='/home/rajeshkancharla/order_items.avsc')
+
+
+# Import as ORC
+	# There is no direct ORC support for Sqoop
+	# Step 1: Create tables for TEXT and ORC Import
+	# Step 2: Sqoop import to TEXT file
+	# Step 3: Insert into ORC from TEXT
+
+	CREATE EXTERNAL TABLE order_items_text (order_item_id int, order_item_order_id int, order_item_product_id int, order_item_quantity int, order_item_subtotal float, order_item_product_price float) 
+	STORED AS TEXTFILE LOCATION "/apps/hive/warehouse/rajeshk.db/order_items_text";
+
+	CREATE EXTERNAL TABLE order_items_orc (order_item_id int, order_item_order_id int, order_item_product_id int, order_item_quantity int, order_item_subtotal float, order_item_product_price float) 
+	STORED AS ORC LOCATION "/apps/hive/warehouse/rajeshk.db/order_items_orc";
+
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --hive-import \
+	 --hive-overwrite \
+	 --hive-database rajeshk \
+	 --hive-table order_items_text
+
+	INSERT INTO order_items_orc SELECT * FROM order_items_text
+	-- After this is done, the data is stored as ORC format in the hive warehouse directory
+	-- The data is accessible via the Hive Table
+	-- A dataframe can be created from the orc path df = sqlContext.read.orc("/apps/hive/warehouse/rajeshk.db/order_items_orc")
+
+# Import as JSON
+	# There is no direct import from Sqoop to JSON
+	# Import as text file and using RDD/DF save them to JSON
+
+	sqoop import \
+	 --connect jdbc:mysql://nn01.itversity.com/retail_db \
+	 --username retail_dba \
+	 --password itversity \
+	 --table order_items \
+	 --target-dir order_items_text_comma \
+	 --as-textfile
+
+	from pyspark.sql import Row
+	orderItemsRDD = sc.textFile("order_items_text_comma")
+	orderItemsDF = orderItemsRDD.map(lambda rec: Row(order_item_id = int(rec.split(",")[0]), order_item_order_id = int(rec.split(",")[1]),order_item_product_id = int(rec.split(",")[2]), order_item_quantity = int(rec.split(",")[3]), order_item_subtotal = float(rec.split(",")[4]), order_item_product_price = float(rec.split(",")[5]))).toDF()
+
+	orderItemsDF.toJSON().saveAsTextFile("order_items_json")
+	>>> sqlContext.setConf("spark.sql.json.compression.codec","snappy")
+	orderItemsDF.toJSON().saveAsTextFile("order_items_json_snappy")
+
+
+============================================================================================================================================
+
+Read Avro File:
+
+Launch PYSPARK with Databricks package
+$ pyspark --packages com.databricks:spark-avro_2.10:2.0.1
+
+>>> orderItemsDF = sqlContext.read.format("com.databricks.spark.avro").load("order_items_avro")
+>>> orderItemsDF.registerTempTable("order_items_df")
+>>> orderItemsNewDF = sqlContext.sql("select order_item_order_id, round(sum(order_item_subtotal),2) as order_item_subtotal from order_items_df group by order_item_order_id")
+>>> orderItemsNewDF.rdd.map(lambda rec: "|".join(map(str, rec))).coalesce(1).saveAsTextFile("avro_as_piped_text")
+>>> orderItemsNewDF.rdd.map(lambda rec: "|".join([str(x) for x in rec])).coalesce(1).saveAsTextFile("avro_as_piped_text1")
