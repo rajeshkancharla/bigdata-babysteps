@@ -214,3 +214,33 @@ hive> describe function <function_name>;
 
 -- In order to sort revenues based on a date group, after the group by query, use below
 distribute by o.order_date sort by o.order_date, order_revenue desc
+
+
+-- Complex Data Types
+
+create table mobilephones
+(
+id string,
+title string,
+cost float,
+colors array<string>,
+screen_size array<float>,
+features map<string, boolean>,
+information struct<battery:string,camera:string>
+)
+row format delimited fields terminated by ','
+collection items terminated by '#'
+map keys terminated by ':'
+
+-- arrays are referred using index array[0]
+-- map are referred using keys map['key']
+-- struct are referred using '.' struct.property
+
+-- explode(array) => splits array into separate rows
+-- posexplode(array) => splits array into separate rows with the position in the original array
+-- explode(map) => splits map into two columns, key and value
+
+-- lateral views are created using the explode/posexplode functions
+
+
+
