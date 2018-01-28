@@ -241,6 +241,6 @@ map keys terminated by ':'
 -- explode(map) => splits map into two columns, key and value
 
 -- lateral views are created using the explode/posexplode functions
-
+-- lateral views can be used to join back to the main table having the complex types.
 
 
