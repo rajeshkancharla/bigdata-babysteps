@@ -1,5 +1,8 @@
 /*
-Hive is a data warehousing infrastructure based on Apache Hadoop. Hive is designed to enable easy data summarization, ad-hoc querying and analysis of large volumes of data. It provides SQL which enables users to do ad-hoc querying, summarization and data analysis easily. Hive is not designed for Online Transaction processing. It is best used for traditional data warehousing tasks
+Hive is a data warehousing infrastructure based on Apache Hadoop. 
+Hive is designed to enable easy data summarization, ad-hoc querying and analysis of large volumes of data. 
+It provides SQL which enables users to do ad-hoc querying, summarization and data analysis easily. 
+Hive is not designed for Online Transaction processing. It is best used for traditional data warehousing tasks
 */
 
 /* Source files */
@@ -95,7 +98,8 @@ hive> select * from employee order by e_dept;
 -- Even if external table is dropped, the data still remains.
 
 /* External Table */
-create external table ex_test (user_id int, common_name string, user_type string, gender string, country string, state string, freq string, year int, month int, day int) 
+create external table ex_test (user_id int, common_name string, user_type string, gender string, 
+                               country string, state string, freq string, year int, month int, day int) 
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' 
 LOCATION '/user/rajesh.kancharla_outlook/hive_files/retention';
 
@@ -104,6 +108,15 @@ SELECT * FROM ex_test
 -- It concatenates all the files in the folder and shows the results
 -- If the files in the path are not of the same structure, wherever the data type matches, the data gets loaded and others become NULL
 -- So it must be ensured of consistent format while using files for external table in hive
+
+
+/* 
+Difference between managed and external table
+-- Managed Table source file is moved from source path to the hdfs path
+-- Managed Table is completely owned and maintained by hive. Once you drop, both data and metadata are gone
+-- External Table source file is copied from source path to hdfs path. Source path, data is still retained.
+-- External table's metadata is maintained in Hive. When it is dropped, only metadata is deleted, the source data still remains.
+*/
 
 -- *************************************************************************************************************************************
 /* PARTITIONING */
@@ -162,6 +175,11 @@ hive> insert into table emp_dpart partition(e_dept) select e_id, e_name, e_salar
 -- to see all the partitions on a table
 hive> show partitions emp_dpart;
 
+-- Managed tables partitioning is defined in the create table statement
+-- Data is loaded using load data inpath command by pointing to the respective directory.
+
+-- External tables partitioning needs to be done with an alter statement. 
+-- The alter statement creates partition and points to the respective directory where the partitioned data is present.
 
 -- *************************************************************************************************************************************
 /* BUCKETING */
