@@ -40,7 +40,7 @@ SPARK:
 -- Faster than MR but how much faster depends on lot of factors - memory, more data in memory - more faster, data spilled to disk - perf. decreases.
 -- Def perf is better for iterative jobs.
 -- development with spark is easy
--- Higher the RAM better it is - tradeoff between cost and performance. Spend more to bet 256GB RAM and get optimal performance
+-- Higher the RAM better it is - tradeoff between cost and performance. Spend more to get 256GB RAM and get optimal performance
 
 Java provides APIs for the below languages:
 -- SCALA / PYTHON / JAVA / R
