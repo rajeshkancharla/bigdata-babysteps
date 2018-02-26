@@ -236,4 +236,22 @@ D = FOREACH C GENERATE group, COUNT(B);
 STORE D INTO '/user/rajesh.kancharla_outlook/pig_files/emp_wc.txt' USING PigStorage(',');
 
 -- Using PigLatin for loading an XML file
---   https://stackoverflow.com/questions/30052325/reading-xml-using-pig
+--   Source: https://stackoverflow.com/questions/30052325/reading-xml-using-pig
+
+-- XPATH Approach:
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+A = LOAD 'testXML.xml' using org.apache.pig.piggybank.storage.XMLLoader('document') as (x:chararray);
+B = FOREACH A GENERATE XPath(x, 'document/url'), XPath(x, 'document/category'), XPath(x, 'document/usercount');
+C = LOAD 'testXML.xml' using org.apache.pig.piggybank.storage.XMLLoader('review') as (review:chararray);
+D = FOREACH C GENERATE XPath(review,'review');
+E = cross B,D;
+dump E;
+
+-- REGEX Approach:
+A = LOAD 'testXML.xml' using org.apache.pig.piggybank.storage.XMLLoader('document') as (x:chararray);
+B = FOREACH A GENERATE FLATTEN(REGEX_EXTRACT_ALL(x,'(?s)<document>.*?<url>([^>]*?)</url>.*?<category>([^>]*?)
+</category>.*?<usercount>([^>]*?)</usercount>.*?</document>')) as (url:chararray,catergory:chararray,usercount:int);
+C = LOAD 'testXML.xml' using org.apache.pig.piggybank.storage.XMLLoader('review') as (review:chararray);
+D = FOREACH C GENERATE FLATTEN(REGEX_EXTRACT_ALL(review,'<review>([^>]*?)</review>'));
+E = cross B,D;
+dump E;
