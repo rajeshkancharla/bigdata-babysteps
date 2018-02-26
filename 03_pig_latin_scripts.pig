@@ -235,3 +235,5 @@ C = GROUP B by word;
 D = FOREACH C GENERATE group, COUNT(B);
 STORE D INTO '/user/rajesh.kancharla_outlook/pig_files/emp_wc.txt' USING PigStorage(',');
 
+-- Using PigLatin for loading an XML file
+--   https://stackoverflow.com/questions/30052325/reading-xml-using-pig
