@@ -1,8 +1,12 @@
 -- Pig Latin is a dataflow language and environment for exploring very large datasets
--- It lets you specify a sequence of data transformations such as merging data sets, filtering them, and applying functions to records or groups of records. 
--- Pig comes with many built-in functions but you can also create your own user-defined functions to do special-purpose processing. 
--- Pig Latin programs run in a distributed fashion on a cluster (programs are complied into Map/Reduce jobs and executed using Hadoop). 
--- For quick prototyping, Pig Latin programs can also run in "local mode" without a cluster (all processing takes place in a single local JVM).
+-- It lets you specify a sequence of data transformations such as merging data sets, filtering them, 
+and applying functions to records or groups of records. 
+-- Pig comes with many built-in functions but you can also create your own user-defined functions 
+to do special-purpose processing. 
+-- Pig Latin programs run in a distributed fashion on a cluster (programs are complied into 
+Map/Reduce jobs and executed using Hadoop). 
+-- For quick prototyping, Pig Latin programs can also run in "local mode" without a cluster 
+(all processing takes place in a single local JVM).
 
 -- For the purpose of understanding Pig Latin at a very basic level, the following files are used.
 
@@ -50,10 +54,12 @@ grunt> dump name;
 
 /* Load emp.txt with schema */
 -- While loading the data from a file, the structure of the data can be specified as a schema
-grunt> employee = load '/user/rajesh.kancharla_outlook/pig_files/emp.txt' using PigStorage(',') as (emp_id:int, emp_name:chararray, emp_dept:chararray, emp_salary:int);
+grunt> employee = load '/user/rajesh.kancharla_outlook/pig_files/emp.txt' using PigStorage(',') 
+as (emp_id:int, emp_name:chararray, emp_dept:chararray, emp_salary:int);
 grunt> dump employee;
 
-grunt> dept = load '/user/rajesh.kancharla_outlook/pig_files/dept.txt' using PigStorage(',') as (dept_id:chararray, dept_name:chararray);
+grunt> dept = load '/user/rajesh.kancharla_outlook/pig_files/dept.txt' using PigStorage(',') 
+as (dept_id:chararray, dept_name:chararray);
 grunt> dump dept;
 
 
@@ -178,7 +184,8 @@ grunt> dump empdept;
 (2,Peter,SALES,1200,SALES, Sales Department)
 
 grunt> describe empdept;
-empdept: {employee::emp_id: int,employee::emp_name: chararray,employee::emp_dept: chararray,employee::emp_salary: int,dept::dept_id: chararray,dept::dept_name: chararray}
+empdept: {employee::emp_id: int,employee::emp_name: chararray,employee::emp_dept: chararray,
+employee::emp_salary: int,dept::dept_id: chararray,dept::dept_name: chararray}
 
 grunt> name_sal = FOREACH employee GENERATE emp_name, emp_salary;
 grunt> dump name_sal;
