@@ -1,7 +1,10 @@
 # About Sqoop:
 # ============
-# Sqoop is a tool designed to transfer data between Hadoop and relational databases or mainframes. You can use Sqoop to import data from a relational database management system (RDBMS) such as MySQL or Oracle or a mainframe into the Hadoop Distributed File System (HDFS), transform the data in Hadoop MapReduce, and then export the data back into an RDBMS.
-# Sqoop automates most of this process, relying on the database to describe the schema for the data to be imported. Sqoop uses MapReduce to import and export the data, which provides parallel operation as well as fault tolerance.
+# Sqoop is a tool designed to transfer data between Hadoop and relational databases or mainframes. 
+# You can use Sqoop to import data from a relational database management system (RDBMS) such as MySQL or Oracle or a mainframe 
+# into the Hadoop Distributed File System (HDFS), transform the data in Hadoop MapReduce, and then export the data back into an RDBMS.
+# Sqoop automates most of this process, relying on the database to describe the schema for the data to be imported. 
+# Sqoop uses MapReduce to import and export the data, which provides parallel operation as well as fault tolerance.
 
 
 # Actions that take place with Sqoop command:
@@ -11,7 +14,8 @@
 # At this point, Sqoop is not transfering any data between database and HDFS, it is only querying catalog of tables and views.
 # Based on retrieved metadata, Sqoop generates a JAVA class and compile it using the JDK and Hadoop libraries.
 # Sqoop connects to the Hadoop cluster and submits a MapReduce job. Each mapper of the job transfers a slice of table's data.
-# As MapReduce executes multiple mappers at same time, Sqoop will transfer data in parallel to achieve the best possible performance by utilizing the potentia of the database server.
+# As MapReduce executes multiple mappers at same time, Sqoop will transfer data in parallel to achieve the best 
+# possible performance by utilizing the potentia of the database server.
 # Each mapper transfers the table's data directly between the database and Hadoop cluster.
 # It is advised not to use resource intensive functions while fetching data from the database, as it effects performance.
 
@@ -100,7 +104,8 @@ sqoop import
 # FULL IMPORT OF TABLE WITH SPLIT BY
 # Import table from RDBMS to HDFS using split-by
   # When there is no primary key on a table and only one partition is required then it's fine.
-  # When there is no primary key on a table and more than one partition is required, then there should be a split-by clause, else the Sqoop job would fail.
+  # When there is no primary key on a table and more than one partition is required, then there should be a split-by clause, 
+  # else the Sqoop job would fail.
   # The split-by clause splits the input data set into different ranges based on their values
   # Having more than one partition without primary key and without split-by leads to error
   # 'num-mappers' is same as 'm'
@@ -207,7 +212,8 @@ sqoop import
 
 
 # COMPRESS FILES
-# Sqoop takes advantage of inherent parallelism of Hadoop by leveraging Hadoop's execution engine, MapReduce to perform data transfers.
+# Sqoop takes advantage of inherent parallelism of Hadoop by leveraging Hadoop's execution engine, 
+# MapReduce to perform data transfers.
 # As MapReduce already has excellent support for compression, Sqoop simply reuses its powerful abilities to provide compression options.
 # All files are created with .gz extension
 
@@ -235,7 +241,8 @@ sqoop import
   --compression-codec org.apache.hadoop.io.compress.SnappyCodec
 
 # SPEED UP TRANSFER
-# Rather than using JDBC interface for transferring data, direct mode delegates the job of transferring data to the native utilities provided by database vendor.
+# Rather than using JDBC interface for transferring data, direct mode delegates the job of transferring data 
+# to the native utilities provided by database vendor.
 # MySQL uses mysqldump and mysqlimport etc. for other database vendors
 # Produces only text output. Sequence File and Avro are not supported
 
@@ -328,7 +335,8 @@ This shows the saved job definitions
   # the query specifies the query to be used
   # the split-by is required to be specified. Generally the Primary key on the table is specified.
   # the target-dir is mandatory while importing a free form query
-  # While importing query results in parallel, then each map task will need to execute a copy of the query with results partitioned by bounding conditions in sqoop
+  # While importing query results in parallel, then each map task will need to execute a copy of the query 
+  # with results partitioned by bounding conditions in sqoop
   # Hence $CONDITIONS token need to be used which each Sqoop process will replace with a unique condition expression
   # if the join query is complex, it is better to store the data into a temporary table and access it in the query
 sqoop import 
@@ -572,7 +580,8 @@ sqoop export
  
    # Consider only selected columns
    # By default Sqoop expects same number of columns in database table and HDFS mapper file
-   # In case the HDFS has lesser number of columns than the database table, use columns parameter to specify required columns in database table that are in HDFS
+   # In case the HDFS has lesser number of columns than the database table, use columns parameter to specify required
+   # columns in database table that are in HDFS
   sqoop export 
   --connect jdbc:mysql://<server_ip>/rajeshk 
   --driver com.mysql.jdbc.Driver 
