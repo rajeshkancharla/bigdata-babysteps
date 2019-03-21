@@ -15,7 +15,7 @@
 # Each mapper transfers the table's data directly between the database and Hadoop cluster.
 # It is advised not to use resource intensive functions while fetching data from the database, as it effects performance.
 
-
+ 
 # GET ALL DATABASES
 # Get the list all the databases available 
 sqoop list-databases 
