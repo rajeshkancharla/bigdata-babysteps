@@ -39,6 +39,7 @@ sqoop list-tables
 
 # CHECK ACCESS ON TABLES
 # Run a simple SQL query to check whether the table's data is accessible
+# the SQL query can be a DDL / DML also
 # It is also possible to run stored procedures/functions using eval command
 sqoop eval 
   --connect jdbc:mysql://<server_ip>/rajeshk 
@@ -85,6 +86,15 @@ sqoop import
   --table emp 
   -m 1
 
+# OVERWRITE TARGET DIRECTORY
+# While importing, of the target directory already exists, the import fails.
+# Hence in order to overwrite on the existing target directory, use delete-target-dir argument
+sqoop import \
+  --connect jdbc:mysql://ms.itversity.com:3306/retail_db \
+  --username retail_user \
+  --password itversity \
+  --table order_items \
+  --delete-target-dir
 
 # FULL IMPORT OF TABLE WITH DEFAULT MAPPERS
 # Import table from RDBMS to HDFS using default mappers
