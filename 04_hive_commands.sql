@@ -236,7 +236,7 @@ distribute by o.order_date sort by o.order_date, order_revenue desc
 
 -- Complex Data Types
 
-create table mobilephones
+create table mobilephones 
 (
 id string,
 title string,
