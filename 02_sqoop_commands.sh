@@ -117,6 +117,7 @@ sqoop import
   # When there is no primary key on a table and more than one partition is required, then there should be a split-by clause, 
   # else the Sqoop job would fail.
   # The split-by clause splits the input data set into different ranges based on their values
+  # the column used in split-by needs to be indexed. Sqoop creates the min and max ranges based on this column. No NULL values.
   # Having more than one partition without primary key and without split-by leads to error
   # 'num-mappers' is same as 'm'
 sqoop import 
@@ -128,6 +129,9 @@ sqoop import
   --split-by empno 
   --num-mappers 2
 
+# Split by a numeric field is fine and Sqoop can create min and max values based on range and split into partitions.
+# If we need to use split by a non-numeric field, we need to set the command line parameter
+# -Dorg.apache.sqoop.splitter.allow_text_splitter=true
 
 # FULL IMPORT OF TABLE INTO A DIRECTORY
 # Import table from RDBMS to HDFS in particular directory
