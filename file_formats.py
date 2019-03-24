@@ -1,5 +1,6 @@
 # Launch Pyspark
-# pyspark --master yarn --conf spark.ui.port=12345 –num-executors 10 –executor-cores 2 –executor-memory 3G –packages com.databricks:spark-avro_2.10:2.0.1
+# pyspark --master yarn --conf spark.ui.port=12345 –num-executors 10 –executor-cores 2 –executor-memory 3G –packages 
+# com.databricks:spark-avro_2.10:2.0.1
 pyspark --master yarn --num-executors 10 --packages com.databricks:spark-avro_2.10:2.0.1
 
 from pyspark import Row
