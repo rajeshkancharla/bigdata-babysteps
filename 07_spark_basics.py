@@ -390,3 +390,39 @@ import com.databricks.spark.avro._
 import sqlContext.implicits._
 
 df = sqlContext.read.format("com.databricks.spark.avro").load("kv.avro")
+
+
+#============================================================================
+# Create dataframes 
+
+# the below command created a dataframe from a text file
+orders = spark.read.csv.('filePath',sep=',').toDF('col1','col2','col3')
+# in above command, the col1, col2, col3 are all part of dataframe schema and represent dataframe columns header
+
+
+# the below command creates a dataframe from the underlying hive table
+orders = spark.read.table('HiveTableSchema.HiveTableName')
+
+# the below command creates a dataframe from the underlying hive table
+spark.sql('select * from HiveTableSchema.HiveTableName')
+
+# once you have a dataframe a temporary table can be created
+df.createeOrReplaceTempView("table1")
+spark.sql('select * from table1')  #and this will again result a dataframe                          
+
+
+#============================================================================
+# SPARK SQL
+
+# to list all tables
+spark.sql('show tables') # this returns a dataframe
+spark.sql('show tables').show() # this shows the contents of the dataframe as a tabular form
+
+spark.sql('select * from table1').show()  # this shows the contents of the dataframe as a tabular form
+
+#spark run time properties are saved in /etc/spark/conf folder and it contains below key files
+#  spark-env.sh
+#  spark-defaults.conf
+#  hive-site.xml for hive properties
+
+
